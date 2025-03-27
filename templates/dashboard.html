@@ -4,8 +4,13 @@
   <title>Dashboard</title>
 </head>
 <body>
-<h1>Ward Management Dashboard</h1>
-<a href="/logout">Logout</a>
+
+<header>
+  <div class="page-title">Ward Management Dashboard</div>
+<a href="/logout" class="button" style="float: right; color: white;">Logout</a>
+</header>
+
+<div class="form-container">
 <h2>Patients:</h2>
 <ul>
   {% for patient in patients %}
@@ -14,6 +19,9 @@
   </li>
   {% endfor %}
 </ul>
+</div>
+
+<div class="form-container">
 <h2>Admit Patient:</h2>
 <form method="POST" action="/admit">
   <input type="text" name="name" placeholder="Name" required><br>
@@ -21,5 +29,72 @@
   <input type="number" name="bed" placeholder="Bed Number" required><br>
   <button type="submit">Admit</button>
 </form>
+</div>
 </body>
+
+<style>
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f9;
+  }
+
+  header {
+    background-color: forestgreen;
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 24px;
+    font-weight: bold;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  h2 {
+    margin-top: 0;
+  }
+
+  .form-container {
+    background: white;
+    margin: 30px auto;
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 600px;
+  }
+
+  input[type=text], input[type=number] {
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin: 10px 0;
+    display: block;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+  }
+
+  button {
+      background-color: #30AD23;
+      color: white;
+      padding: 10px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      width: 100%;
+      opacity: 0.9;
+    }
+  
+  button:hover {
+    opacity: 1;
+  }
+
+  a {
+    color: #D0F0C0;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  
+</style>
 </html>
