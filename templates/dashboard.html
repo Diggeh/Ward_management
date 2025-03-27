@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dashboard</title>
+</head>
+<body>
+<h1>Ward Management Dashboard</h1>
+<a href="/logout">Logout</a>
+<h2>Patients:</h2>
+<ul>
+  {% for patient in patients %}
+  <li>{{ patient[1] }} - {{ patient[2] }} - Bed {{ patient[3] }} - {{ patient[4] }}
+    <a href="/discharge/{{ patient[0] }}">Discharge</a>
+  </li>
+  {% endfor %}
+</ul>
+<h2>Admit Patient:</h2>
+<form method="POST" action="/admit">
+  <input type="text" name="name" placeholder="Name" required><br>
+  <input type="text" name="ward" placeholder="Ward" required><br>
+  <input type="number" name="bed" placeholder="Bed Number" required><br>
+  <button type="submit">Admit</button>
+</form>
+</body>
+</html>
