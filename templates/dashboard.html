@@ -33,24 +33,9 @@
 </div>
 </div>
 
-<div class="background-image"></div>
-
 </body>
 
 <style>
-
-.background-image {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: url('https://images.pexels.com/photos/236380/pexels-photo-236380.jpeg?auto=compress&cs=tinysrgb') no-repeat center center;
-    background-size: cover;
-    z-index: -1;
-    animation: fadeInImage 1s ease-in-out;
-    opacity: 0.39;
-  }
 
   body {
     font-family: Arial, Helvetica, sans-serif;
@@ -90,26 +75,17 @@
     gap: 20px;
     align-items: center;
     margin-top: 100px;
-    /* animation: fadeInContainer 1s ease-in-out; */
+    animation: fadeInContainer 1s ease-in-out;
   }
 
-  @keyframes fadeInImage {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 0.39;
-    }
-  }
-
-  /* @keyframes fadeInContainer {
+  @keyframes fadeInContainer {
     from {
       opacity: 0;
     }
     to {
       opacity: 1;
     }
-  } */
+  }
 
   input[type=text], input[type=number] {
     width: calc(100% - 20px);
