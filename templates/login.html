@@ -11,6 +11,9 @@
   <button type="submit">Login</button>
   
 </form>
+
+<div class ="background-image"></div>
+
 </body>
 
 <style>
@@ -32,6 +35,7 @@
     border-radius: 10px;
     max-width: 400px;
     width: 400px;
+    /* animation: fadeInForm 1s ease-in-out; */
   }
 
   h1 {
@@ -68,5 +72,38 @@
   button:hover {
     opacity:1;
   }
+
+  .background-image {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('https://images.pexels.com/photos/236380/pexels-photo-236380.jpeg?auto=compress&cs=tinysrgb') no-repeat center center;
+    background-size: cover;
+    z-index: -1;
+    animation: fadeInImage 1s ease-in-out;
+    opacity: 0.39;
+  }
+
+
+
+  @keyframes fadeInImage {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 0.39;
+    }
+  }
+
+  /* @keyframes fadeInForm {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  } */
 </style>
 </html>
