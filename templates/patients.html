@@ -69,6 +69,23 @@
         text-decoration: underline;
     }
 
+    #hoverSidebar ul li button {
+        background-color: white;
+        color: black;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        width:100%;
+        font-size: 16px;
+    }
+
+    #hoverSidebar ul li button:hover {
+        background-color:#D0F0C0;
+        color:black;
+        text-decoration:none;
+    }
+
     #hoverZone {
         position: fixed;
         top: 0;
@@ -93,8 +110,8 @@
 <div id="hoverSidebar">
     <!--  <h2>Ward Management System</h2>-->
     <ul>
-        <li><a href="dashboard.html">Dashboard</a></li>
-        <li><a href="patients.html">Patients</a></li>
+        <li><button onclick="location.href='dashboard.html'">Dashboard</button></li>
+        <li><button onclick="location.href='patients.html'">Patient</button></li>
         <li><a href="#">Link 3</a></li>
     </ul>
 </div>
