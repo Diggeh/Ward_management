@@ -3,37 +3,6 @@
 <head>
   <title>Dashboard</title>
 </head>
-<body>
-
-<header>
-  <div class="page-title">Ward Management Dashboard</div>
-<a href="/logout" class="button" style="float: right; color: white;">Logout</a>
-</header>
-
-<div class="main-container">
-<div class="form-container">
-<h2>Patients:</h2>
-<ul>
-  {% for patient in patients %}
-  <li>{{ patient[1] }} - {{ patient[2] }} - Bed {{ patient[3] }} - {{ patient[4] }}
-    <a href="/discharge/{{ patient[0] }}">Discharge</a>
-  </li>
-  {% endfor %}
-</ul>
-</div>
-
-<div class="form-container">
-<h2>Admit Patient:</h2>
-<form method="POST" action="/admit">
-  <input type="text" name="name" placeholder="Name" required><br>
-  <input type="text" name="ward" placeholder="Ward" required><br>
-  <input type="number" name="bed" placeholder="Bed Number" required><br>
-  <button type="submit">Admit</button>
-</form>
-</div>
-</div>
-
-</body>
 
 <style>
 
@@ -99,17 +68,17 @@
   }
 
   button {
-      background-color: #30AD23;
-      color: white;
-      padding: 10px;
-      margin: 10px 0;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      width: 100%;
-      opacity: 0.9;
-    }
-  
+    background-color: #30AD23;
+    color: white;
+    padding: 10px;
+    margin: 10px 0;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+    opacity: 0.9;
+  }
+
   button:hover {
     opacity: 1;
   }
@@ -119,6 +88,104 @@
     text-decoration: none;
     font-weight: bold;
   }
-  
+  #hoverSidebar {
+    position: fixed;
+    top: 58px;
+    left: -200px;
+    width: 200px;
+    height: calc(100% - 70px);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 20px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3);
+    transition: left 0.3s ease;
+    z-index: 1000;
+  }
+
+  #hoverSidebar:hover {
+    left: 0;
+  }
+
+  /*#hoverSidebar h2 {*/
+  /*  margin-top: 0;*/
+  /*  font-size: 12px;*/
+  /*  text-align: center;*/
+  /*  color: #D0F0C0;*/
+  /*}*/
+
+  #hoverSidebar ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  #hoverSidebar ul li {
+    margin: 90px 0;
+  }
+
+  #hoverSidebar ul li a {
+    color: white;
+    text-decoration: none;
+    font-size: 20px;
+  }
+
+  #hoverSidebar ul li a:hover {
+    text-decoration: underline;
+  }
+
+  #hoverZone {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 20px;
+    height: 100%;
+    z-index: 900;
+  }
+
+  #hoverZone:hover + #hoverSidebar {
+    left: 0;
+  }
 </style>
+
+<body>
+<header>
+  <div class="page-title">Ward Management Dashboard</div>
+<a href="/logout" class="button" style="float: right; color: white;">Logout</a>
+</header>
+
+<div id="hoverSidebar">
+<!--  <h2>Ward Management System</h2>-->
+  <ul>
+    <li><a href="dashboard.html">Dashboard</a></li>
+    <li><a href="patients.html">Patients</a></li>
+    <li><a href="#">Link 3</a></li>
+  </ul>
+</div>
+
+<div id="hoverZone"></div>
+
+<div class="main-container">
+<div class="form-container">
+<h2>Patients:</h2>
+<ul>
+  {% for patient in patients %}
+  <li>{{ patient[1] }} - {{ patient[2] }} - Bed {{ patient[3] }} - {{ patient[4] }}
+    <a href="/discharge/{{ patient[0] }}">Discharge</a>
+  </li>
+  {% endfor %}
+</ul>
+</div>
+
+<div class="form-container">
+<h2>Admit Patient:</h2>
+<form method="POST" action="/admit">
+  <input type="text" name="name" placeholder="Name" required><br>
+  <input type="text" name="ward" placeholder="Ward" required><br>
+  <input type="number" name="bed" placeholder="Bed Number" required><br>
+  <button type="submit">Admit</button>
+</form>
+</div>
+</div>
+</body>
+
+
 </html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Patients</title>
+</head>
+
+<style>
+    body {
+        font-family: Arial, Helvetica, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f9;
+    }
+
+    header {
+        background-color: forestgreen;
+        color: white;
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 24px;
+        font-weight: bold;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    #hoverSidebar {
+        position: fixed;
+        top: 58px;
+        left: -200px;
+        width: 200px;
+        height: calc(100% - 70px);
+        background-color: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 20px;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3);
+        transition: left 0.3s ease;
+        z-index: 1000;
+    }
+
+    #hoverSidebar:hover {
+        left: 0;
+    }
+
+    /*#hoverSidebar h2 {*/
+    /*  margin-top: 0;*/
+    /*  font-size: 12px;*/
+    /*  text-align: center;*/
+    /*  color: #D0F0C0;*/
+    /*}*/
+
+    #hoverSidebar ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    #hoverSidebar ul li {
+        margin: 90px 0;
+    }
+
+    #hoverSidebar ul li a {
+        color: white;
+        text-decoration: none;
+        font-size: 20px;
+    }
+
+    #hoverSidebar ul li a:hover {
+        text-decoration: underline;
+    }
+
+    #hoverZone {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 20px;
+        height: 100%;
+        z-index: 900;
+    }
+
+    #hoverZone:hover + #hoverSidebar {
+        left: 0;
+    }
+</style>
+
+<body>
+
+<header>
+    <div class="page-title">Patients List</div>
+    <a href="/logout" class="button" style="float: right; color: white;">Logout</a>
+</header>
+
+<div id="hoverSidebar">
+    <!--  <h2>Ward Management System</h2>-->
+    <ul>
+        <li><a href="dashboard.html">Dashboard</a></li>
+        <li><a href="patients.html">Patients</a></li>
+        <li><a href="#">Link 3</a></li>
+    </ul>
+</div>
+
+<div id="hoverZone"></div>
+
+</body>
+</html>
