@@ -2,9 +2,8 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Patients</title>
+    <title>Bed Assignments</title>
 </head>
-
 <style>
     body {
         font-family: Arial, Helvetica, sans-serif;
@@ -23,16 +22,15 @@
         font-size: 24px;
         font-weight: bold;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        position: fixed;
+        top: 0;
+        width: 100%;
+        z-index: 1001;
+        box-sizing: border-box;
     }
 
-    .form-container {
-        border: 1px solid #ccc;
-        background: white;
-        margin: 30px auto;
-        padding: 20px;
-        border-radius: 10px;
-        max-width: 600px;
-        width: 100%;
+    h2 {
+        margin-top: 0;
     }
 
     .main-container {
@@ -44,12 +42,44 @@
         animation: fadeInContainer 1s ease-in-out;
     }
 
+    @keyframes fadeInContainer {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    button {
+        background-color: white;
+        font-size: 20px;
+        color: black;
+        padding: 10px 50px;
+        margin: 20px auto;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        cursor: pointer;
+        max-width: 600px;
+        width: 100%;
+        opacity: 0.9;
+    }
+
+    button:hover {
+        opacity: 1;
+    }
+
+    a {
+        color: #D0F0C0;
+        text-decoration: none;
+        font-weight: bold;
+    }
     #hoverSidebar {
         position: fixed;
         top: 58px;
         left: -200px;
         width: 200px;
-        height: calc(100% - 70px);
+        height: calc(100% - 58px);
         background-color: rgba(0, 0, 0, 0.8);
         color: white;
         padding: 20px;
@@ -76,6 +106,7 @@
 
     #hoverSidebar ul li {
         margin: 90px 0;
+
     }
 
     #hoverSidebar ul li a {
@@ -118,27 +149,11 @@
         left: 0;
     }
 </style>
-
 <body>
-
 <header>
-    <div class="page-title">Patients List</div>
+    <div class="page-title">Ward Management Dashboard</div>
     <a href="/logout" class="button" style="float: right; color: white;">Logout</a>
 </header>
-
-<div class="main-container">
-<div class="form-container">
-    <h2>Patients:</h2>
-    <ul>
-        {% for patient in patients %}
-        <li>{{ patient[1] }} - {{ patient[2] }} - Bed {{ patient[3] }} - {{ patient[4] }}
-            <a href="/discharge/{{ patient[0] }}">Discharge</a>
-        </li>
-        {% endfor %}
-    </ul>
-</div>
-</div>
-
 <div id="hoverSidebar">
     <!--  <h2>Ward Management System</h2>-->
     <ul>
@@ -150,5 +165,7 @@
 
 <div id="hoverZone"></div>
 
+<div class="main-container">
+</div>
 </body>
 </html>

@@ -31,7 +31,26 @@ def login():
 @app.route('/dashboard')
 def dashboard():
     patients = query_db('SELECT * FROM patients')
-    return render_template('dashboard.html', patients=patients)
+
+    recent_admissions = query_db(
+    '''
+    SELECT * FROM admissions
+    WHERE AdmissionDate >= datetime('now', '-7 days')
+    ORDER BY AdmissionDate DESC
+    '''
+    )
+
+    recent_discharges = query_db(
+            '''
+            SELECT * FROM admissions
+            WHERE DischargeDate IS NOT NULL AND DischargeDate >= datetime('now', '-7 days')
+            ORDER BY DischargeDate DESC
+            '''
+        )
+    return render_template('dashboard.html',
+    recent_admissions=recent_admissions,
+    recent_discharges=recent_discharges
+    )
 
 @app.route('/admit', methods=['POST'])
 def admit():

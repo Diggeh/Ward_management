@@ -45,11 +45,23 @@
     width: 100%;
   }
 
+  .form-container-admin {
+    border: 1px solid #ccc;
+    background: white;
+    margin: 30px 0;
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 600px;
+    width: 100%;
+    margin-left: 220px;
+    position: relative;
+
+  }
+
   .main-container {
     display: flex;
     flex-direction: column;
     gap: 20px;
-    align-items: center;
     margin-top: 100px;
     animation: fadeInContainer 1s ease-in-out;
   }
@@ -58,14 +70,15 @@
     display: flex;
     justify-content: center;
     gap: 20px;
-    margin: 20px 0;
+    margin: 10px 50px;
+    align-items: center;
   }
 
   .button-container button {
     background-color: forestgreen;
     color: white;
     border: none;
-    padding: 20px 50px;
+    padding: 10px;
     border-radius: 5px;
     cursor: pointer;
     font-size: 20px;
@@ -228,19 +241,31 @@
   <div class="button-container">
     <button onclick="location.href='admission.html'">Admissions</button>
     <button onclick="location.href='patients.html'">Patients</button>
+    <button onclick="location.href='beds.html'">Beds</button>
   </div>
 
-<div class="form-container">
-<h2>Patients:</h2>
-<ul>
-  {% for patient in patients %}
-  <li>{{ patient[1] }} - {{ patient[2] }} - Bed {{ patient[3] }} - {{ patient[4] }}
-    <a href="/discharge/{{ patient[0] }}">Discharge</a>
-  </li>
-  {% endfor %}
-</ul>
-</div>
+  <div class="form-container-admin">
+    <h2>Recent Admissions:</h2>
+    <ul>
+      {% for admission in recent_admissions %}
+      <li>
+        {{ admission[1] }} admitted on {{ admission[2] }} with diagnosis: {{ admission[3] }}
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
 
+  <div class="form-container-admin">
+    <h2>Recent Discharges:</h2>
+    <ul>
+      {% for discharge in recent_discharges %}
+      <li>
+        {{ discharge[1] }} discharged on {{ discharge[4] }} with diagnosis: {{ discharge[3] }}
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+  </div>
 <!--<div class="form-container">-->
 <!--  <h2>Notifications:</h2>-->
 <!--  <ul id="notifications">-->
