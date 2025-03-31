@@ -35,7 +35,7 @@
     margin-top: 0;
   }
 
-  .form-container {
+  .form-container-notif {
     border: 1px solid #ccc;
     background: white;
     margin: 30px auto;
@@ -48,27 +48,37 @@
   .form-container-admin {
     border: 1px solid #ccc;
     background: white;
-    margin: 0 0;
-    padding: 20px;
+    padding: 50px;
     border-radius: 10px;
-    max-width: 600px;
-    width: 100%;
-    margin-left: 220px;
-    position: relative;
+    width: 50%;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   }
 
-  .form-container-wards {
+  .form-container-ward {
     border: 1px solid #ccc;
     background: white;
-    margin: 30px 10px;
-    padding: 20px;
+    padding: 50px;
     border-radius: 10px;
-    max-width: 600px;
     width: 100%;
-    margin-left: 220px;
-    position: relative;
+    /*height: 1000px;*/
+    margin-bottom: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     align-items: center;
+  }
 
+  .dashboard-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 40px;
+    margin-top: 30px;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+
+  .left-section, .right-section {
+    max-width: 45%;
   }
 
   .main-container {
@@ -234,7 +244,6 @@
   table {
     width: 100%;
     border-collapse: collapse;
-    margin: 20px 0;
   }
 
   table, th, td {
@@ -275,28 +284,8 @@
     <button onclick="location.href='patients.html'">Patients</button>
     <button onclick="location.href='beds.html'">Beds</button>
   </div>
-
-  <div class="form-container-admin">
-    <h2>Ward Capacities:</h2>
-    <table>
-      <thead>
-      <tr>
-        <th>Ward Name</th>
-        <th>Capacity</th>
-        <th>Type</th>
-      </tr>
-      </thead>
-      <tbody>
-      {% for ward in wards %}
-      <tr>
-        <td>{{ ward[0] }}</td>
-        <td>{{ ward[1] }}</td>
-        <td>{{ ward[2] }}</td>
-      </tr>
-      {% endfor %}
-      </tbody>
-    </table>
-  </div>
+<div class="dashboard-wrapper">
+  <div class="left-section">
 
   <div class="form-container-admin">
     <h2>Recent Admissions:</h2>
@@ -319,14 +308,96 @@
       {% endfor %}
     </ul>
   </div>
+    <div class="form-container-notif">
+      <h2>Notifications:</h2>
+      <ul id="notifications">
+        <li>Example</li>
+        <li>Example</li>
+      </ul>
+    </div>
+ </div>
+
+  <div class="divider"></div>
+
+<div class="right-section">
+  <div class="form-container-ward">
+    <h2>Ward Capacities:</h2>
+    <table>
+      <thead>
+      <tr>
+        <th>Ward Name</th>
+        <th>Capacity</th>
+        <th>Type</th>
+      </tr>
+      </thead>
+      <tbody>
+      {% for ward in wards %}
+      <tr>
+        <td>{{ ward[0] }}</td>
+        <td>{{ ward[1] }}</td>
+        <td>{{ ward[2] }}</td>
+      </tr>
+      <tr>
+        <td>{{ ward[0] }}</td>
+        <td>{{ ward[1] }}</td>
+        <td>{{ ward[2] }}</td>
+      </tr>
+      <tr>
+        <td>{{ ward[0] }}</td>
+        <td>{{ ward[1] }}</td>
+        <td>{{ ward[2] }}</td>
+      </tr>
+      <tr>
+        <td>{{ ward[0] }}</td>
+        <td>{{ ward[1] }}</td>
+        <td>{{ ward[2] }}</td>
+      </tr>
+      <tr>
+        <td>{{ ward[0] }}</td>
+        <td>{{ ward[1] }}</td>
+        <td>{{ ward[2] }}</td>
+      </tr>
+      <tr>
+        <td>{{ ward[0] }}</td>
+        <td>{{ ward[1] }}</td>
+        <td>{{ ward[2] }}</td>
+      </tr>
+      <tr>
+        <td>{{ ward[0] }}</td>
+        <td>{{ ward[1] }}</td>
+        <td>{{ ward[2] }}</td>
+      </tr>
+      <tr>
+        <td>{{ ward[0] }}</td>
+        <td>{{ ward[1] }}</td>
+        <td>{{ ward[2] }}</td>
+      </tr>
+      <tr>
+        <td>{{ ward[0] }}</td>
+        <td>{{ ward[1] }}</td>
+        <td>{{ ward[2] }}</td>
+      </tr>
+      <tr>
+        <td>{{ ward[0] }}</td>
+        <td>{{ ward[1] }}</td>
+        <td>{{ ward[2] }}</td>
+      </tr>
+      <tr>
+        <td>{{ ward[0] }}</td>
+        <td>{{ ward[1] }}</td>
+        <td>{{ ward[2] }}</td>
+      </tr>
+      <tr>
+        <td>{{ ward[0] }}</td>
+        <td>{{ ward[1] }}</td>
+        <td>{{ ward[2] }}</td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
   </div>
-<div class="form-container">
-  <h2>Notifications:</h2>
-  <ul id="notifications">
-    <li>Example</li>
-    <li>Example</li>
-  </ul>
 </div>
+  </div>
 
 </div>
 </body>
