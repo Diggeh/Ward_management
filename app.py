@@ -47,9 +47,13 @@ def dashboard():
             ORDER BY DischargeDate DESC
             '''
         )
+
+        wards = query_db('SELECT WardName, WardCapacity, WardType FROM Wards ORDER BY WardName ASC')
+
     return render_template('dashboard.html',
     recent_admissions=recent_admissions,
-    recent_discharges=recent_discharges
+    recent_discharges=recent_discharges,
+    wards=wards
     )
 
 @app.route('/admit', methods=['POST'])

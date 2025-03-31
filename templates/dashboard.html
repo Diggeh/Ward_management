@@ -48,13 +48,26 @@
   .form-container-admin {
     border: 1px solid #ccc;
     background: white;
-    margin: 30px 0;
+    margin: 0 0;
     padding: 20px;
     border-radius: 10px;
     max-width: 600px;
     width: 100%;
     margin-left: 220px;
     position: relative;
+  }
+
+  .form-container-wards {
+    border: 1px solid #ccc;
+    background: white;
+    margin: 30px 10px;
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 600px;
+    width: 100%;
+    margin-left: 220px;
+    position: relative;
+    align-items: center;
 
   }
 
@@ -205,18 +218,37 @@
     left: 0;
   }
 
-  /*#notifications {*/
-  /*  list-style-type: none;*/
-  /*  padding: 0;*/
-  /*}*/
+  #notifications {
+    list-style-type: none;
+    padding: 0;
+  }
 
-  /*#notifications li {*/
-  /*  background: #eef3ee;*/
-  /*  border: 1px solid #ccc;*/
-  /*  margin: 10px 0;*/
-  /*  padding: 10px;*/
-  /*  border-radius: 5px;*/
-  /*}*/
+  #notifications li {
+    background: #eef3ee;
+    border: 1px solid #ccc;
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 5px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+  }
+
+  table, th, td {
+    border: 1px solid #ccc;
+  }
+
+  th, td {
+    padding: 10px;
+    text-align: center;
+  }
+
+  th {
+    background-color: #f4f4f4;
+  }
 </style>
 
 <body>
@@ -245,6 +277,28 @@
   </div>
 
   <div class="form-container-admin">
+    <h2>Ward Capacities:</h2>
+    <table>
+      <thead>
+      <tr>
+        <th>Ward Name</th>
+        <th>Capacity</th>
+        <th>Type</th>
+      </tr>
+      </thead>
+      <tbody>
+      {% for ward in wards %}
+      <tr>
+        <td>{{ ward[0] }}</td>
+        <td>{{ ward[1] }}</td>
+        <td>{{ ward[2] }}</td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="form-container-admin">
     <h2>Recent Admissions:</h2>
     <ul>
       {% for admission in recent_admissions %}
@@ -266,27 +320,27 @@
     </ul>
   </div>
   </div>
-<!--<div class="form-container">-->
-<!--  <h2>Notifications:</h2>-->
-<!--  <ul id="notifications">-->
-<!--    <li>Example</li>-->
-<!--    <li>Example</li>-->
-<!--  </ul>-->
-<!--</div>-->
+<div class="form-container">
+  <h2>Notifications:</h2>
+  <ul id="notifications">
+    <li>Example</li>
+    <li>Example</li>
+  </ul>
+</div>
 
 </div>
 </body>
 
-<!--<script>-->
-<!--  const notificationData = [-->
-<!--    { type: 'cleaning', message: 'Cleaning Needed' },-->
-<!--    { type: 'maintenance', message: 'Maintenance Needed' },-->
-<!--  ];-->
-<!--  const notificationList = document.getElementById('notifications');-->
-<!--  notificationData.forEach(notification => {-->
-<!--    const li = document.createElement('li');-->
-<!--    li.textContent = notification.message;-->
-<!--    notificationList.appendChild(li);-->
-<!--  });-->
-<!--</script>-->
+<script>
+  const notificationData = [
+    { type: 'cleaning', message: 'Cleaning Needed' },
+    { type: 'maintenance', message: 'Maintenance Needed' },
+  ];
+  const notificationList = document.getElementById('notifications');
+  notificationData.forEach(notification => {
+    const li = document.createElement('li');
+    li.textContent = notification.message;
+    notificationList.appendChild(li);
+  });
+</script>
 </html>
