@@ -16,11 +16,11 @@
   header {
     background-color: forestgreen;
     color: white;
-    padding: 15px 20px;
+    padding: 20px 20px;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    font-size: 24px;
+    font-size: 20px;
     font-weight: bold;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     position: fixed;
@@ -38,6 +38,8 @@
     display: flex;
     align-items: center; /* Align buttons vertically */
     gap: 15px; /* Space between menu and logout button */
+    right: 20px;
+    position: absolute;
   }
 
   .form-container {
@@ -108,7 +110,7 @@
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3);
     position: fixed;
     left: -289px;
-    top: 100px;
+    top: 63px;
     transition: left 0.3s ease;
     z-index: 1000;
   }
@@ -152,6 +154,8 @@
     cursor: pointer;
     padding: 10px;
     justify-content: center;
+    right: 930px;
+    position: fixed;
   }
 
   .sidebar-active {
@@ -161,7 +165,7 @@
 
 <body>
 <header>
-  <div class="page-title">Ward Management Admissions</div>
+  <div class="page-title">Patient Admissions</div>
   <div class="header-buttons">
     <button id="menu-toggle" class="burger-menu">☰</button>
   <a href="/logout" class="button" style="float: right; color: white;">Logout</a>
