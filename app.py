@@ -48,7 +48,7 @@ def dashboard():
             '''
         )
 
-        wards = query_db('SELECT WardName, WardCapacity, WardType FROM Wards ORDER BY WardName ASC')
+    wards = query_db('SELECT WardName, WardCapacity, WardType FROM Wards ORDER BY WardName ASC')
 
     return render_template('dashboard.html',
     recent_admissions=recent_admissions,
