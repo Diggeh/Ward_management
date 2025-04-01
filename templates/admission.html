@@ -2,194 +2,278 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Admissions</title>
-</head>
+    <title>Patient Admission</title>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
 
-<style>
-  body {
-    font-family: Arial, Helvetica, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f4f4f9;
-  }
+        header {
+            background-color: forestgreen;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1001;
+            box-sizing: border-box;
+        }
 
-  header {
-    background-color: forestgreen;
-    color: white;
-    padding: 15px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 24px;
-    font-weight: bold;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    position: fixed;
-    top: 0;
-    width: 100%;
-    z-index: 1001;
-    box-sizing: border-box;
-  }
+        .form-container {
+            border: 1px solid #ccc;
+            background: white;
+            margin: 30px auto;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 600px;
+            width: 100%;
+        }
 
-  h2 {
-    margin-top: 0;
-  }
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+            margin-top: 100px;
+        }
 
-  .form-container {
-    border: 1px solid #ccc;
-    background: white;
-    margin: 30px auto;
-    padding: 20px;
-    border-radius: 10px;
-    max-width: 600px;
-    width: 100%;
-  }
+        input[type=text] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin: 10px 0;
+            display: block;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
 
-  .main-container {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    align-items: center;
-    margin-top: 200px;
-    animation: fadeInContainer 1s ease-in-out;
-  }
+        button {
+            background-color: #30AD23;
+            color: white;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            opacity: 0.9;
+        }
 
-  @keyframes fadeInContainer {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
+        button:hover {
+            opacity: 1;
+        }
 
-  input[type=text], input[type=number] {
-    width: calc(100% - 20px);
-    padding: 10px;
-    margin: 10px 0;
-    display: block;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    box-sizing: border-box;
-  }
+        #hoverSidebar {
+            position: fixed;
+            top: 58px;
+            left: -200px;
+            width: 200px;
+            height: calc(100% - 58px);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3);
+            transition: left 0.3s ease;
+            z-index: 1000;
+        }
 
-  button {
-    background-color: #30AD23;
-    color: white;
-    padding: 10px;
-    margin: 10px 0;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    width: 100%;
-    opacity: 0.9;
-  }
+        #hoverSidebar:hover {
+            left: 0;
+        }
 
-  button:hover {
-    opacity: 1;
-  }
+        #hoverSidebar ul {
+            list-style: none;
+            padding: 0;
+        }
 
-  a {
-    color: #D0F0C0;
-    text-decoration: none;
-    font-weight: bold;
-  }
-  #hoverSidebar {
-    position: fixed;
-    top: 58px;
-    left: -200px;
-    width: 200px;
-    height: calc(100% - 58px);
-    background-color: rgba(0, 0, 0, 0.8);
-    color: white;
-    padding: 20px;
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3);
-    transition: left 0.3s ease;
-    z-index: 1000;
-  }
+        #hoverSidebar ul li {
+            margin: 20px 0;
+        }
 
-  #hoverSidebar:hover {
-    left: 0;
-  }
+        #hoverSidebar ul li button {
+            background-color: white;
+            color: black;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+        }
 
-  #hoverSidebar ul {
-    list-style: none;
-    padding: 0;
-  }
+        #hoverSidebar ul li button:hover {
+            background-color: #D0F0C0;
+        }
 
-  #hoverSidebar ul li {
-    margin: 90px 0;
+        #hoverZone {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 20px;
+            height: 100%;
+            z-index: 900;
+        }
 
-  }
+        .current-admissions {
+            margin-top: 30px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 800px;
+        }
 
-  #hoverSidebar ul li a {
-    color: white;
-    text-decoration: none;
-    font-size: 20px;
-  }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
 
-  #hoverSidebar ul li a:hover {
-    text-decoration: underline;
-  }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
 
-  #hoverSidebar ul li button {
-    background-color: white;
-    color: black;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    width:100%;
-    font-size: 16px;
-  }
+        th {
+            background-color: #f8f9fa;
+        }
 
-  #hoverSidebar ul li button:hover {
-    background-color:#D0F0C0;
-    color:black;
-    text-decoration:none;
-  }
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
 
-  #hoverZone {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 20px;
-    height: 100%;
-    z-index: 900;
-  }
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
 
-  #hoverZone:hover + #hoverSidebar {
-    left: 0;
-  }
-</style>
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
 
-<body>
-<header>
-  <div class="page-title">Ward Management Dashboard</div>
-  <a href="/logout" class="button" style="float: right; color: white;">Logout</a>
-</header>
+       select {
+          width: calc(100% - 22px); /* Match input field width */
+          padding: 10px;
+          margin: 10px 0;
+          display: block;
+          border: 1px solid #ccc;
+          border-radius: 5px;
+          background-color: #f1f1f1; /* Match input background */
+          font-family: Arial, Helvetica, sans-serif;
+          font-size: 1em;
+          -webkit-appearance: none; /* Remove default arrow on some browsers */
+          -moz-appearance: none;
+          appearance: none;
+          background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+          background-repeat: no-repeat;
+          background-position: right 10px center;
+          background-size: 1em;
+      }
+
+      select:focus {
+          background-color: #ddd; /* Match input focus */
+          outline: none;
+      }
+          </style>
+      </head>
+      <body>
+      <header>
+          <div class="page-title">Patient Admission</div>
+          <a href="{{ url_for('auth.logout') }}" class="button" style="float: right; color: white;">Logout</a>
+      </header>
 
 <div id="hoverSidebar">
-  <!--  <h2>Ward Management System</h2>-->
-  <ul>
-    <li><button onclick="location.href='dashboard.html'">Dashboard</button></li>
-    <li><button onclick="location.href='patients.html'">Patient</button></li>
-    <li><a href="#">Link 3</a></li>
-  </ul>
+    <ul>
+        <li><button onclick="window.location.href='{{ url_for('main.dashboard') }}'">Dashboard</button></li>
+        <li><button onclick="window.location.href='{{ url_for('main.admission') }}'">Admission</button></li>
+    </ul>
 </div>
 
 <div id="hoverZone"></div>
 
 <div class="main-container">
-  <div class="form-container">
-    <h2>Admit Patient:</h2>
-    <form method="POST" action="/admit">
-      <input type="text" name="name" placeholder="Name" required><br>
-      <input type="text" name="ward" placeholder="Ward" required><br>
-      <input type="number" name="bed" placeholder="Bed Number" required><br>
-      <button type="submit">Admit</button>
+    <div class="form-container">
+    <h2>New Admission</h2>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('main.admission') }}">
+        <input type="text" name="name" placeholder="Patient Full Name" required>
+
+        <select name="ward" required>
+            <option value="" disabled selected>Select Ward</option>
+            {% for ward in wards %}
+            <option value="{{ ward.WardID }}">{{ ward.WardName }}</option>
+            {% endfor %}
+        </select>
+
+        <input type="text" name="bed" placeholder="Bed Number" required>
+        <button type="submit">Admit Patient</button>
     </form>
-  </div>
 </div>
 
+    <div class="form-container current-admissions">
+        <h2>Currently Admitted Patients</h2>
+        {% if admissions %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Patient ID</th>
+                    <th>Name</th>
+                    <th>Ward</th>
+                    <th>Bed</th>
+                    <th>Admission Date</th>
+                    <th>Doctor</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for admission, patient, ward, bed in admissions %}
+                <tr>
+                    <td>{{ patient.PatientID }}</td>
+                    <td>{{ patient.FirstName }} {{ patient.LastName }}</td>
+                    <td>{{ ward.WardName }}</td>
+                    <td>{{ bed.BedNumber }}</td>
+                    <td>{{ admission.AdmissionDate.strftime('%Y-%m-%d') }}</td>
+                    <td>{{ admission.DoctorInCharge }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No current admissions</p>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    document.getElementById('hoverZone').addEventListener('mouseover', function() {
+        document.getElementById('hoverSidebar').style.left = '0';
+    });
+
+    document.getElementById('hoverSidebar').addEventListener('mouseleave', function() {
+        this.style.left = '-200px';
+    });
+</script>
 </body>
 </html>

@@ -1,13 +1,11 @@
-from flask import Flask, redirect, url_for, session, render_template
+from flask import Flask, redirect, url_for
 from flask_login import LoginManager, current_user
-from flask_sqlalchemy import SQLAlchemy
 from database import db
 from auth import auth_bp
 from patients import patients_bp
 from wards import wards_bp
 from main import main_bp
 import os
-from flask import flash
 
 app = Flask(__name__)
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -33,7 +31,7 @@ login_manager.login_message_category = 'info'
 @login_manager.user_loader
 def load_user(user_id):
     from models import User
-    return User.query.get(int(user_id))
+    return User.query.filter_by(id=int(user_id)).first()
 
 app.register_blueprint(auth_bp, url_prefix='/auth')
 app.register_blueprint(patients_bp, url_prefix='/patients')
