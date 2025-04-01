@@ -63,7 +63,7 @@ def admit():
     bed = request.form['bed']
     status = 'Admitted'
     query_db('INSERT INTO patients (name, ward, bed, status) VALUES (?, ?, ?, ?)', (name, ward, bed, status))
-    return redirect(url_for('dashboard'))
+    return redirect(url_for('admission.html'))
 
 @app.route('/discharge/<int:patient_id>')
 def discharge(patient_id):
@@ -73,7 +73,7 @@ def discharge(patient_id):
 @app.route('/patient/<int:patient_id>')
 def patient_details(patient_id):
     patient = query_db('SELECT * FROM patients WHERE id = ?', (patient_id,), one=True)
-    return render_template('patient_details.html', patient=patient)
+    return render_template('patients.html', patient=patient)
 
 @app.route('/logout')
 def logout():
