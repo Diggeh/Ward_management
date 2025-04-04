@@ -1,9 +1,10 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
 from flask_login import login_required, current_user
 from database import db
-from models import Patient, Ward, Bed, Admission, Role, User
+from models import Patient, Ward, Bed, Admission, Role, User, MedicalRecord
 from datetime import datetime, timedelta
 from sqlalchemy.orm import joinedload
+from sqlalchemy import or_
 from forms import AdmissionForm
 
 main_bp = Blueprint('main', __name__)
@@ -118,3 +119,108 @@ def wards():
 def patients():
 
     return render_template('patients.html')
+
+@main_bp.route('/medical-records')
+@login_required
+def medical_records():
+    # Get all medical records by default
+    records = db.session.query(MedicalRecord, Patient)\
+        .join(Patient, MedicalRecord.PatientID == Patient.PatientID)\
+        .order_by(MedicalRecord.RecordDate.desc())\
+        .all()
+    
+    return render_template('medical_records.html', 
+                           records=records,
+                           user=current_user)
+    
+@main_bp.route('/search-records')
+@login_required
+def search_records():
+    search_term = request.args.get('query', '')
+    
+    # Search 
+    if search_term:
+        records = db.session.query(MedicalRecord, Patient)\
+            .join(Patient, MedicalRecord.PatientID == Patient.PatientID)\
+            .filter(
+                or_(
+                    Patient.FirstName.ilike(f'%{search_term}%'),
+                    Patient.LastName.ilike(f'%{search_term}%')
+                )
+            )\
+            .order_by(MedicalRecord.RecordDate.desc())\
+            .all()
+    else:
+        # If there's no search, then return every record
+        records = db.session.query(MedicalRecord, Patient)\
+            .join(Patient, MedicalRecord.PatientID == Patient.PatientID)\
+            .order_by(MedicalRecord.RecordDate.desc())\
+            .all()
+            
+     # JSON formatting
+    records_data = []
+    for record, patient in records:
+        records_data.append({
+            'record_id': record.RecordID,
+            'patient_id': patient.PatientID,
+            'patient_name': f"{patient.FirstName} {patient.LastName}",
+            'record_date': record.RecordDate.strftime('%Y-%m-%d') if record.RecordDate else '',
+            'conditions': record.Conditions,
+            'allergies': record.Allergies,
+            'medications': record.Medications,
+            'notes': record.Notes
+        })
+    
+    return jsonify(records_data)          
+
+@main_bp.route('/get-record/<int:record_id>')
+@login_required
+def get_record(record_id):
+    record = db.session.query(MedicalRecord, Patient)\
+        .join(Patient, MedicalRecord.PatientID == Patient.PatientID)\
+        .filter(MedicalRecord.RecordID == record_id)\
+        .first()
+    
+    if not record:
+        return jsonify({'error': 'Record not found'}), 404
+    
+    record_obj, patient = record
+    
+    return jsonify({
+        'record_id': record_obj.RecordID,
+        'patient_id': patient.PatientID,
+        'patient_name': f"{patient.FirstName} {patient.LastName}",
+        'record_date': record_obj.RecordDate.strftime('%Y-%m-%d') if record_obj.RecordDate else '',
+        'conditions': record_obj.Conditions,
+        'allergies': record_obj.Allergies,
+        'medications': record_obj.Medications,
+        'notes': record_obj.Notes
+    })
+
+@main_bp.route('/update-record/<int:record_id>', methods=['POST'])
+@login_required
+def update_record(record_id):
+    record = MedicalRecord.query.get(record_id)
+    
+    if not record:
+        return jsonify({'error': 'Record not found'}), 404
+    
+    data = request.json
+    
+    try:
+        # Update fields from form
+        record.RecordDate = datetime.strptime(data.get('record_date'), '%Y-%m-%d') if data.get('record_date') else None
+        record.Allergies = data.get('allergies')
+        record.Conditions = data.get('conditions')
+        record.Medications = data.get('medications')
+        record.Notes = data.get('notes')
+        
+        db.session.commit()
+        
+        return jsonify({'success': True, 'message': 'Record updated successfully'})
+    
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 5
+    
+    
