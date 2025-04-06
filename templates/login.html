@@ -2,94 +2,121 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Login</title>
+  <title>Login - Ward Management System</title>
+  <style>
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: #012737;
+    }
+
+    .main-container {
+      padding: 50px;
+      background: #003044;
+      border-radius: 10px;
+      max-width: 500px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      animation: fadeInForm 1s ease-in-out;
+    }
+
+    h1 {
+      font-size: 40px;
+      color: white;
+      margin-top: 0;
+      margin-bottom: 20px;
+      font-family: 'Canva', sans-serif;
+    }
+
+    .divider {
+      border: 2px solid #00415d;
+      width: 80%;
+      margin: 10px auto;
+    }
+
+    .divider-thin {
+      border: 2px solid #00415d;
+      width: 50%;
+      margin: 20px auto;
+    }
+
+    input[type=password], input[type=text] {
+      width: 100%;
+      padding: 15px;
+      margin: 10px 0;
+      display: block;
+      border: 1px solid #ccc;
+      background: #f9f9f9;
+      border-radius: 5px;
+      box-sizing: border-box;
+    }
+
+    input[type=text]:focus, input[type=password]:focus {
+      background-color: #f1f1f1;
+      outline: none;
+      border: 1px solid #0b3d60;
+    }
+
+    button {
+      background-color: #0b3d60;
+      color: white;
+      padding: 15px;
+      margin: 20px 0;
+      border: none;
+      cursor: pointer;
+      width: 100%;
+      font-weight: bold;
+      border-radius: 5px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #0A3D62;
+    }
+
+    .alert {
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 5px;
+      color: white;
+      text-align: center;
+      animation: fadeIn 0.5s;
+    }
+
+    .alert-danger {
+      background-color: #f44336;
+    }
+
+    .alert-success {
+      background-color: #4CAF50;
+    }
+
+    .logo {
+      width: 200px;
+      margin-top: 20px;
+    }
+
+    @keyframes fadeInForm {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  </style>
 </head>
-<style>
-  body {
-    font-family: Arial, Helvetica, sans-serif;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background: #f8f9fa;
-  }
-
-  .form-container {
-    border: 1px solid #ccc;
-    padding: 50px;
-    background: white;
-    border-radius: 10px;
-    max-width: 400px;
-    width: 400px;
-    animation: fadeInForm 1s ease-in-out;
-  }
-
-  h1 {
-    text-align: center;
-    margin-top: 0;
-  }
-
-  input[type=password], input[type=text] {
-    width: calc(100% - 30px);
-    padding: 15px;
-    margin: 10px 0;
-    display: block;
-    border: none;
-    background: #f1f1f1;
-    border-radius: 5px;
-  }
-
-  input[type=text]:focus, input[type=password]:focus {
-    background-color: #ddd;
-    outline: none;
-  }
-
-  button {
-    background-color: #30AD23;
-    color: white;
-    padding: 15px;
-    margin: 10px 0;
-    border: none;
-    cursor: pointer;
-    width: 100%;
-    opacity: 0.9;
-    border-radius: 5px;
-    font-size: 16px;
-  }
-
-  button:hover {
-    opacity:1;
-  }
-
-  .alert {
-    padding: 15px;
-    margin-bottom: 20px;
-    border-radius: 5px;
-    color: white;
-    text-align: center;
-  }
-
-  .alert-danger {
-    background-color: #f44336; /* Red */
-  }
-
-  .alert-success {
-    background-color: #4CAF50; /* Green */
-  }
-
-  @keyframes fadeInForm {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-</style>
 <body>
-<div class="form-container">
+<div class="main-container">
+  <!-- Flash messages -->
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
       {% for category, message in messages %}
@@ -102,9 +129,14 @@
 
   <form method="POST" action="{{ url_for('auth.login') }}">
     <h1>Login</h1>
-    <input type="text" name="username" placeholder="Username" required><br>
-    <input type="password" name="password" placeholder="Password" required><br>
+    <div class="divider"></div>
+    <div class="divider-thin"></div>
+    
+    <input type="text" name="username" placeholder="Username" required>
+    <input type="password" name="password" placeholder="Password" required>
     <button type="submit">Login</button>
+    
+    <img src="CIIT-College-logo-negative.png" alt="CIIT Logo" class="logo">
   </form>
 </div>
 </body>
