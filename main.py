@@ -117,8 +117,86 @@ def wards():
 @main_bp.route('/patients')
 @login_required  # Add if you want it protected
 def patients():
+    return render_template('patients.html', user=current_user)
 
-    return render_template('patients.html')
+@main_bp.route('/search-patients')
+@login_required
+def search_patients():
+    search_term = request.args.get('query', '')
+    
+    # Search for patients
+    if search_term:
+        patients = Patient.query.filter(
+                or_(
+                    Patient.FirstName.ilike(f'%{search_term}%'),
+                    Patient.LastName.ilike(f'%{search_term}%')
+                )
+            ).order_by(Patient.LastName.asc()).all()
+    else:
+        # If there's no search term, return all patients
+        patients = Patient.query.order_by(Patient.LastName.asc()).all()
+            
+    # JSON formatting
+    patients_data = []
+    for patient in patients:
+        patients_data.append({
+            'patient_id': patient.PatientID,
+            'patient_name': f"{patient.FirstName} {patient.LastName}",
+            'gender': 'Male' if patient.Gender == 1 else 'Female' if patient.Gender == 2 else 'Other',
+            'dob': patient.DateOfBirth.strftime('%Y-%m-%d') if patient.DateOfBirth else '',
+            'contact': patient.ContactNumber,
+            'emergency_contact': patient.EmergencyContact,
+            'address': patient.Address
+        })
+    
+    return jsonify(patients_data)
+
+@main_bp.route('/get-patient/<int:patient_id>')
+@login_required
+def get_patient(patient_id):
+    patient = Patient.query.get(patient_id)
+    
+    if not patient:
+        return jsonify({'error': 'Patient not found'}), 404
+    
+    return jsonify({
+        'patient_id': patient.PatientID,
+        'first_name': patient.FirstName,
+        'last_name': patient.LastName,
+        'gender': patient.Gender,
+        'dob': patient.DateOfBirth.strftime('%Y-%m-%d') if patient.DateOfBirth else '',
+        'contact': patient.ContactNumber,
+        'emergency_contact': patient.EmergencyContact,
+        'address': patient.Address
+    })
+
+@main_bp.route('/update-patient/<int:patient_id>', methods=['POST'])
+@login_required
+def update_patient(patient_id):
+    patient = Patient.query.get(patient_id)
+    
+    if not patient:
+        return jsonify({'error': 'Patient not found'}), 404
+    
+    data = request.json
+    
+    try:
+        # Update fields from form
+        patient.FirstName = data.get('first_name')
+        patient.LastName = data.get('last_name')
+        patient.Gender = data.get('gender')
+        patient.DateOfBirth = datetime.strptime(data.get('dob'), '%Y-%m-%d') if data.get('dob') else None
+        patient.ContactNumber = data.get('contact')
+        patient.EmergencyContact = data.get('emergency_contact')
+        patient.Address = data.get('address')
+        
+        db.session.commit()
+        
+        return jsonify({'success': True, 'message': 'Patient information updated successfully'})
+    
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
 
 @main_bp.route('/medical-records')
 @login_required
@@ -221,6 +299,13 @@ def update_record(record_id):
     
     except Exception as e:
         db.session.rollback()
-        return jsonify({'error': str(e)}), 5
+        return jsonify({'error': str(e)}), 500
     
+@main_bp.route('/admin')
+@login_required
+def admin_page():
+    if not current_user.role_id or current_user.role_id != 1:
+        flash('Access denied. You must be an administrator to view this page.', 'danger')
+        return redirect(url_for('main.dashboard'))
     
+    return render_template('admin.html', user=current_user)

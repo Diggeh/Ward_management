@@ -12,8 +12,8 @@ class Admission(db.Model):
     DoctorInCharge = db.Column(db.Text)
 
     # Relationships
-    patient = db.relationship('Patient', backref='patient_admissions')
-    bed = db.relationship('Bed', backref='bed_admissions')
+    patient = db.relationship('Patient', backref='admissions')
+    bed = db.relationship('Bed', backref='admissions')
 
 class Bed(db.Model):
     __tablename__ = 'Beds'
@@ -23,8 +23,8 @@ class Bed(db.Model):
     BedStatus = db.Column(db.Text)
 
     # Relationships
-    ward = db.relationship('Ward', backref='ward_beds')
-    admissions = db.relationship('Admission', backref='admission_bed')
+    ward = db.relationship('Ward', backref='beds')
+    # Removed redundant admissions relationship (defined in Admission class)
 
 class MedicalRecord(db.Model):
     __tablename__ = 'MedicalRecords'
@@ -37,7 +37,7 @@ class MedicalRecord(db.Model):
     Notes = db.Column(db.Text)
 
     # Relationship
-    patient = db.relationship('Patient', backref='patient_records')
+    patient = db.relationship('Patient', backref='medical_records')
 
 class Patient(db.Model):
     __tablename__ = 'Patients'
@@ -50,6 +50,8 @@ class Patient(db.Model):
     EmergencyContact = db.Column(db.Integer)
     Address = db.Column(db.Text)
 
+    # Relationships defined via backref in other models
+
 class Ward(db.Model):
     __tablename__ = 'Wards'
     WardID = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -57,17 +59,22 @@ class Ward(db.Model):
     WardCapacity = db.Column(db.Integer)
     WardType = db.Column(db.Text)
 
+    # Relationships defined via backref in other models
+
 class Role(db.Model):
     __tablename__ = 'roles'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     role_name = db.Column(db.Text, nullable=False, unique=True)
-    users = db.relationship('User', backref='user_role')
+    users = db.relationship('User', backref='role')
+    
+    # Use backref from RolePermission
 
 class Permission(db.Model):
     __tablename__ = 'permissions'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     permission_name = db.Column(db.Text, nullable=False, unique=True)
-    role_permissions = db.relationship('RolePermission', backref='permission_roles')
+    
+    # Use backref from RolePermission
 
 class RolePermission(db.Model):
     __tablename__ = 'role_permissions'
@@ -76,8 +83,8 @@ class RolePermission(db.Model):
     permission_id = db.Column(db.Integer, db.ForeignKey('permissions.id'))
 
     # Relationships
-    role = db.relationship('Role', backref='role_permissions')
-    permission = db.relationship('Permission', backref='permission_roles')
+    role = db.relationship('Role', backref='permissions_assoc')
+    permission = db.relationship('Permission', backref='roles_assoc')
 
 class User(db.Model, UserMixin):
     __tablename__ = 'users'
@@ -85,6 +92,8 @@ class User(db.Model, UserMixin):
     username = db.Column(db.Text, nullable=False, unique=True)
     password = db.Column(db.Text, nullable=False)
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
+
+    # Role relationship defined via backref in Role class
 
     def get_id(self):
         return str(self.id)

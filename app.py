@@ -2,7 +2,6 @@ from flask import Flask, redirect, url_for
 from flask_login import LoginManager, current_user
 from database import db
 from auth import auth_bp
-from patients import patients_bp
 from wards import wards_bp
 from main import main_bp
 import os
@@ -34,7 +33,6 @@ def load_user(user_id):
     return User.query.filter_by(id=int(user_id)).first()
 
 app.register_blueprint(auth_bp, url_prefix='/auth')
-app.register_blueprint(patients_bp, url_prefix='/patients')
 app.register_blueprint(wards_bp, url_prefix='/wards')
 app.register_blueprint(main_bp)
 
