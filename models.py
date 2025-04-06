@@ -10,10 +10,12 @@ class Admission(db.Model):
     DischargeDate = db.Column(db.Date)
     Diagnosis = db.Column(db.Text)
     DoctorInCharge = db.Column(db.Text)
+    doctor_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
     # Relationships
     patient = db.relationship('Patient', backref='admissions')
     bed = db.relationship('Bed', backref='admissions')
+    doctor = db.relationship('User', backref='doctor_admissions', foreign_keys=[doctor_id])
 
 class Bed(db.Model):
     __tablename__ = 'Beds'
@@ -45,7 +47,7 @@ class Patient(db.Model):
     FirstName = db.Column(db.Text, nullable=False)
     LastName = db.Column(db.Text, nullable=False)
     DateOfBirth = db.Column(db.Date, nullable=False)
-    Gender = db.Column(db.Integer)
+    Gender = db.Column(db.Text)
     ContactNumber = db.Column(db.Integer)
     EmergencyContact = db.Column(db.Integer)
     Address = db.Column(db.Text)

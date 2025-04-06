@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS "Admissions" (
 	"DischargeDate"	DATE,
 	"Diagnosis"	TEXT,
 	"DoctorInCharge"	TEXT,
+	"doctor_id"	INTEGER,
 	PRIMARY KEY("AdmissionID" AUTOINCREMENT),
 	FOREIGN KEY("BedID") REFERENCES "Beds"("BedID"),
 	FOREIGN KEY("PatientID") REFERENCES "Patients"("PatientID")
@@ -35,7 +36,7 @@ CREATE TABLE IF NOT EXISTS "Patients" (
 	"FirstName"	TEXT NOT NULL,
 	"LastName"	TEXT NOT NULL,
 	"DateOfBirth"	DATE NOT NULL,
-	"Gender"	INTEGER CHECK("Gender" IN ('Male', 'Female', 'Other')),
+	"Gender"	TEXT CHECK("Gender" IN ('Male', 'Female', 'Other')),
 	"ContactNumber"	INTEGER,
 	"EmergencyContact"	INTEGER,
 	"Address"	TEXT,
@@ -74,26 +75,26 @@ CREATE TABLE IF NOT EXISTS "users" (
 	PRIMARY KEY("id" AUTOINCREMENT),
 	FOREIGN KEY("role_id") REFERENCES "roles"("id")
 );
-INSERT INTO "Admissions" VALUES (1,1,1,'2023-10-01','2023-10-05','Appendicitis','Dr. Smith');
-INSERT INTO "Admissions" VALUES (2,2,2,'2023-10-02',NULL,'Pneumonia','Dr. Johnson');
-INSERT INTO "Admissions" VALUES (3,3,3,'2023-10-03',NULL,'Heart Attack','Dr. Lee');
-INSERT INTO "Admissions" VALUES (4,4,4,'2023-10-04','2023-10-06','Fractured Leg','Dr. Patel');
-INSERT INTO "Admissions" VALUES (5,5,5,'2023-10-05',NULL,'Diabetes','Dr. Brown');
-INSERT INTO "Admissions" VALUES (6,6,6,'2023-10-06','2023-10-08','Hypertension','Dr. Green');
-INSERT INTO "Admissions" VALUES (7,7,7,'2023-10-07',NULL,'Asthma','Dr. White');
-INSERT INTO "Admissions" VALUES (8,8,8,'2023-10-08','2023-10-10','Migraine','Dr. Black');
-INSERT INTO "Admissions" VALUES (9,9,9,'2023-10-09',NULL,'Bronchitis','Dr. Gray');
-INSERT INTO "Admissions" VALUES (10,10,10,'2023-10-10','2023-10-12','Arthritis','Dr. Blue');
-INSERT INTO "Admissions" VALUES (11,11,11,'2023-10-11',NULL,'Flu','Dr. Red');
-INSERT INTO "Admissions" VALUES (12,12,12,'2023-10-12','2023-10-14','Gastritis','Dr. Yellow');
-INSERT INTO "Admissions" VALUES (13,13,13,'2023-10-13',NULL,'Sinusitis','Dr. Orange');
-INSERT INTO "Admissions" VALUES (14,14,14,'2023-10-14','2023-10-16','Tonsillitis','Dr. Purple');
-INSERT INTO "Admissions" VALUES (15,15,15,'2023-10-15',NULL,'Malaria','Dr. Pink');
-INSERT INTO "Admissions" VALUES (16,16,16,'2023-10-16','2023-10-18','Typhoid','Dr. Cyan');
-INSERT INTO "Admissions" VALUES (17,17,17,'2023-10-17',NULL,'Dengue','Dr. Magenta');
-INSERT INTO "Admissions" VALUES (18,18,18,'2023-10-18','2023-10-20','Cholera','Dr. Teal');
-INSERT INTO "Admissions" VALUES (19,19,19,'2023-10-19',NULL,'Tuberculosis','Dr. Maroon');
-INSERT INTO "Admissions" VALUES (20,20,20,'2023-10-20','2023-10-22','COVID-19','Dr. Olive');
+INSERT INTO "Admissions" VALUES (1,1,1,'2023-10-01','2023-10-05','Appendicitis','doctor1',2);
+INSERT INTO "Admissions" VALUES (2,2,2,'2023-10-02',NULL,'Pneumonia','doctor1',2);
+INSERT INTO "Admissions" VALUES (3,3,3,'2023-10-03',NULL,'Heart Attack','doctor1',2);
+INSERT INTO "Admissions" VALUES (4,4,4,'2023-10-04','2023-10-06','Fractured Leg','doctor1',1);
+INSERT INTO "Admissions" VALUES (5,5,5,'2023-10-05',NULL,'Diabetes','doctor1',1);
+INSERT INTO "Admissions" VALUES (6,6,6,'2023-10-06','2023-10-08','Hypertension','doctor1',2);
+INSERT INTO "Admissions" VALUES (7,7,7,'2023-10-07',NULL,'Asthma','doctor1',2);
+INSERT INTO "Admissions" VALUES (8,8,8,'2023-10-08','2023-10-10','Migraine','doctor1',2);
+INSERT INTO "Admissions" VALUES (9,9,9,'2023-10-09',NULL,'Bronchitis','doctor1',2);
+INSERT INTO "Admissions" VALUES (10,10,10,'2023-10-10','2023-10-12','Arthritis','doctor1',2);
+INSERT INTO "Admissions" VALUES (11,11,11,'2023-10-11',NULL,'Flu','doctor1',2);
+INSERT INTO "Admissions" VALUES (12,12,12,'2023-10-12','2023-10-14','Gastritis','doctor1',2);
+INSERT INTO "Admissions" VALUES (13,13,13,'2023-10-13',NULL,'Sinusitis','doctor1',2);
+INSERT INTO "Admissions" VALUES (14,14,14,'2023-10-14','2023-10-16','Tonsillitis','doctor1',2);
+INSERT INTO "Admissions" VALUES (15,15,15,'2023-10-15',NULL,'Malaria','doctor1',2);
+INSERT INTO "Admissions" VALUES (16,16,16,'2023-10-16','2023-10-18','Typhoid','doctor1',2);
+INSERT INTO "Admissions" VALUES (17,17,17,'2023-10-17',NULL,'Dengue','doctor1',2);
+INSERT INTO "Admissions" VALUES (18,18,18,'2023-10-18','2023-10-20','Cholera','doctor1',2);
+INSERT INTO "Admissions" VALUES (19,19,19,'2023-10-19',NULL,'Tuberculosis','doctor1',2);
+INSERT INTO "Admissions" VALUES (20,20,20,'2023-10-20','2023-10-22','COVID-19','doctor1',2);
 INSERT INTO "Beds" VALUES (1,1,101,'Occupied');
 INSERT INTO "Beds" VALUES (2,1,102,'Vacant');
 INSERT INTO "Beds" VALUES (3,1,103,'Cleaning');
