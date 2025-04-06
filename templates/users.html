@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Medical Records - Ward Management System</title>
+    <title>User Management - Ward Management System</title>
     <style>
         * {
             margin: 0;
@@ -187,7 +187,32 @@
             background: #00aa88;
         }
 
-        .records-container {
+        .admin-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 16px;
+        }
+
+        .add-user-button {
+            padding: 8px 16px;
+            background: #00cc99;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .add-user-button:hover {
+            background: #00aa88;
+        }
+
+        .users-container {
             margin: 0 24px;
             flex: 1;
             background: #003344;
@@ -196,13 +221,13 @@
             color: white;
         }
 
-        .records-grid {
+        .users-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 20px;
         }
 
-        .record-card {
+        .user-card {
             background: #004455;
             border-radius: 8px;
             padding: 16px;
@@ -210,29 +235,24 @@
             transition: transform 0.2s;
         }
 
-        .record-card:hover {
+        .user-card:hover {
             transform: translateY(-4px);
         }
 
-        .record-header {
+        .user-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 12px;
         }
 
-        .record-title {
+        .user-title {
             font-weight: 600;
         }
 
-        .record-date {
+        .user-role {
             font-size: 14px;
             opacity: 0.8;
-        }
-
-        .record-content {
-            font-size: 14px;
-            line-height: 1.5;
         }
 
         /* Detail View Styles */
@@ -290,30 +310,32 @@
         }
 
         .form-group input,
-        .form-group textarea {
+        .form-group select {
             padding: 12px;
             background: #004455;
             border: none;
             border-radius: 4px;
             color: white;
             font-size: 14px;
-            resize: vertical;
-        }
-
-        .form-group textarea {
-            min-height: 100px;
         }
 
         .form-group input:focus,
-        .form-group textarea:focus {
+        .form-group select:focus {
             outline: 2px solid #0099cc;
         }
 
-        .update-button {
+        /* Button Group Styling */
+        .button-group {
             position: absolute;
             bottom: 24px;
             right: 24px;
-            padding: 12px 32px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .update-button {
+            position: static;
+            padding: 12px 24px;
             background: #00cc99;
             color: white;
             border: none;
@@ -321,12 +343,25 @@
             cursor: pointer;
             font-weight: 600;
             transition: background-color 0.2s;
-            float: none;
-            margin-top: 0;
         }
 
         .update-button:hover {
             background: #00aa88;
+        }
+
+        .delete-button {
+            padding: 12px 24px;
+            background: #ff5555;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+
+        .delete-button:hover {
+            background: #ff3333;
         }
 
         .status-message {
@@ -353,10 +388,16 @@
             display: block;
         }
 
-        .no-records {
+        .no-users {
             text-align: center;
             padding: 24px;
             color: rgba(255, 255, 255, 0.7);
+        }
+
+        .password-note {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 4px;
         }
 
         @media (max-width: 768px) {
@@ -391,7 +432,7 @@
                 border-radius: 4px;
             }
 
-            .records-container {
+            .users-container {
                 margin: 16px;
             }
 
@@ -399,10 +440,16 @@
                 grid-template-columns: 1fr;
             }
 
-            .update-button {
+            .button-group {
                 position: static;
+                flex-direction: column;
                 width: 100%;
                 margin-top: 20px;
+            }
+
+            .update-button,
+            .delete-button {
+                width: 100%;
             }
 
             .status-message {
@@ -414,6 +461,7 @@
 </head>
 
 <body>
+    <input type="hidden" id="current-user-id" value="{{ user.id }}">
     <div class="sidebar">
         <div class="user-info">
             <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2'/%3E%3Ccircle cx='12' cy='7' r='4'/%3E%3C/svg%3E"
@@ -442,20 +490,16 @@
                     alt="Admission">
                 <span>Admission</span>
             </a>
-            <a href="{{ url_for('main.medical_records') }}" class="nav-link active">
+            <a href="{{ url_for('main.medical_records') }}" class="nav-link">
                 <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z'/%3E%3Cpolyline points='14 2 14 8 20 8'/%3E%3Cline x1='16' y1='13' x2='8' y2='13'/%3E%3Cline x1='16' y1='17' x2='8' y2='17'/%3E%3Cpolyline points='10 9 9 9 8 9'/%3E%3C/svg%3E"
                     alt="Medical Records">
                 <span>Medical Records</span>
             </a>
-            {# Show Admin link only if user is an admin (role_id = 1) #}
-            {% if user.role_id == 1 %}
-            <a href="{{ url_for('main.admin_page') }}"
-                class="nav-link {% if request.endpoint == 'main.admin_page' %}active{% endif %}">
+            <a href="{{ url_for('main.admin_page') }}" class="nav-link">
                 <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3Cpath d='M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z'/%3E%3C/svg%3E"
                     alt="Admin">
                 <span>Admin</span>
             </a>
-            {% endif %}
         </nav>
 
         <form action="{{ url_for('auth.logout') }}" method="POST" style="display: inline;">
@@ -469,11 +513,11 @@
 
     <div class="main-content">
         <header class="header">
-            <h1>MEDICAL RECORDS</h1>
+            <h1>USER MANAGEMENT</h1>
             <button class="back-button" style="display: none;">
                 <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cline x1='19' y1='12' x2='5' y2='12'/%3E%3Cpolyline points='12 19 5 12 12 5'/%3E%3C/svg%3E"
                     alt="Back">
-                Back to Records
+                Back to Users
             </button>
         </header>
 
@@ -481,14 +525,22 @@
         <div class="list-view">
             <div class="search-section">
                 <div class="search-container">
-                    <input type="text" id="search-input" class="search-input" placeholder="Search for name...">
+                    <input type="text" id="search-input" class="search-input" placeholder="Search for username...">
                 </div>
                 <button id="search-button" class="enter-button">SEARCH</button>
+
+                <div class="admin-controls">
+                    <button id="add-user-button" class="add-user-button">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cline x1='12' y1='5' x2='12' y2='19'/%3E%3Cline x1='5' y1='12' x2='19' y2='12'/%3E%3C/svg%3E"
+                            width="16" height="16" alt="Add">
+                        Add New User
+                    </button>
+                </div>
             </div>
 
-            <div class="records-container">
-                <div id="records-grid" class="records-grid">
-                    <!-- Records will be loaded here dynamically -->
+            <div class="users-container">
+                <div id="users-grid" class="users-grid">
+                    <!-- Users will be loaded here dynamically -->
                 </div>
             </div>
         </div>
@@ -498,162 +550,162 @@
             <div class="detail-form">
                 <div class="form-grid">
                     <div class="form-group">
-                        <label for="name">Name:</label>
-                        <input type="text" id="name" readonly>
-                        <input type="hidden" id="record-id">
+                        <label for="username">Username:</label>
+                        <input type="text" id="username">
+                        <input type="hidden" id="user-id">
                     </div>
 
                     <div class="form-group">
-                        <label for="recordDate">Record Date:</label>
-                        <input type="date" id="recordDate">
+                        <label for="role">Role:</label>
+                        <select id="role">
+                            <!-- Roles will be loaded dynamically -->
+                        </select>
                     </div>
 
                     <div class="form-group full-width">
-                        <label for="conditions">Conditions:</label>
-                        <textarea id="conditions"></textarea>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="allergies">Allergies:</label>
-                        <textarea id="allergies"></textarea>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="medications">Medication:</label>
-                        <textarea id="medications"></textarea>
-                    </div>
-
-                    <div class="form-group full-width">
-                        <label for="notes">Notes:</label>
-                        <textarea id="notes"></textarea>
+                        <label for="password">Password:</label>
+                        <input type="password" id="password">
+                        <p class="password-note" id="password-note">Leave blank to keep current password.</p>
                     </div>
                 </div>
 
-                <button id="update-button" class="update-button">UPDATE</button>
+                <div class="button-group">
+                    <button id="update-button" class="update-button">UPDATE</button>
+                    <button id="delete-button" class="delete-button" style="display: none;">DELETE</button>
+                </div>
                 <div id="status-message" class="status-message"></div>
             </div>
         </div>
     </div>
 
     <script>
-        // Load all records when the page loads
+        // Load all users when the page loads
         document.addEventListener('DOMContentLoaded', function () {
-            loadRecords();
+            loadUsers();
+            loadRoles();
 
             // Add event listeners
-            document.querySelector('#search-button').addEventListener('click', searchRecords);
+            document.querySelector('#search-button').addEventListener('click', searchUsers);
             document.querySelector('#search-input').addEventListener('keypress', function (e) {
                 if (e.key === 'Enter') {
-                    searchRecords();
+                    searchUsers();
                 }
             });
 
             document.querySelector('.back-button').addEventListener('click', showListView);
-            document.querySelector('#update-button').addEventListener('click', updateRecord);
+            document.querySelector('#update-button').addEventListener('click', updateUser);
+            document.querySelector('#add-user-button').addEventListener('click', showAddUserForm);
+            document.querySelector('#delete-button').addEventListener('click', deleteUser);
         });
 
-        // Function to load all records
-        function loadRecords() {
-            // Check if there's a patient filter in the URL
-            const urlParams = new URLSearchParams(window.location.search);
-            const patientId = urlParams.get('patient');
-
-            // If patient ID is specified, search for that patient's records
-            if (patientId) {
-                fetch(`/search-records?patient=${patientId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        displayRecords(data);
-                    })
-                    .catch(error => {
-                        console.error('Error loading patient records:', error);
-                    });
-            } else {
-                // Otherwise load all records
-                fetch('/search-records')
-                    .then(response => response.json())
-                    .then(data => {
-                        displayRecords(data);
-                    })
-                    .catch(error => {
-                        console.error('Error loading records:', error);
-                    });
-            }
-        }
-
-        // Function to search records
-        function searchRecords() {
-            const searchTerm = document.querySelector('#search-input').value;
-
-            fetch(`/search-records?query=${encodeURIComponent(searchTerm)}`)
+        // Function to load all users
+        function loadUsers() {
+            fetch('/search-users')
                 .then(response => response.json())
                 .then(data => {
-                    displayRecords(data);
+                    displayUsers(data);
                 })
                 .catch(error => {
-                    console.error('Error searching records:', error);
+                    console.error('Error loading users:', error);
                 });
         }
 
-        // Function to display records in the grid
-        function displayRecords(records) {
-            const recordsGrid = document.querySelector('#records-grid');
-            recordsGrid.innerHTML = '';
+        // Function to load all roles
+        function loadRoles() {
+            fetch('/get-roles')
+                .then(response => response.json())
+                .then(data => {
+                    const roleSelect = document.querySelector('#role');
+                    roleSelect.innerHTML = '';
 
-            if (records.length === 0) {
-                recordsGrid.innerHTML = '<div class="no-records">No records found</div>';
+                    data.forEach(role => {
+                        const option = document.createElement('option');
+                        option.value = role.role_id;
+                        option.textContent = role.role_name;
+                        roleSelect.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading roles:', error);
+                });
+        }
+
+        // Function to search users
+        function searchUsers() {
+            const searchTerm = document.querySelector('#search-input').value;
+
+            fetch(`/search-users?query=${encodeURIComponent(searchTerm)}`)
+                .then(response => response.json())
+                .then(data => {
+                    displayUsers(data);
+                })
+                .catch(error => {
+                    console.error('Error searching users:', error);
+                });
+        }
+
+        // Function to display users in the grid
+        function displayUsers(users) {
+            const usersGrid = document.querySelector('#users-grid');
+            usersGrid.innerHTML = '';
+
+            if (users.length === 0) {
+                usersGrid.innerHTML = '<div class="no-users">No users found</div>';
                 return;
             }
 
-            records.forEach(record => {
-                const recordCard = document.createElement('div');
-                recordCard.className = 'record-card';
-                recordCard.setAttribute('data-record-id', record.record_id);
+            users.forEach(user => {
+                const userCard = document.createElement('div');
+                userCard.className = 'user-card';
+                userCard.setAttribute('data-user-id', user.user_id);
 
-                recordCard.innerHTML = `
-                    <div class="record-header">
-                        <span class="record-title">${record.patient_name}</span>
-                        <span class="record-date">${record.record_date}</span>
-                    </div>
-                    <div class="record-content">
-                        <p>${record.conditions ? 'Conditions: ' + truncateText(record.conditions, 30) : 'No conditions recorded'}</p>
-                        <p>${record.medications ? 'Medications: ' + truncateText(record.medications, 30) : 'No medications recorded'}</p>
+                userCard.innerHTML = `
+                    <div class="user-header">
+                        <span class="user-title">${user.username}</span>
+                        <span class="user-role">${user.role_name}</span>
                     </div>
                 `;
 
-                recordCard.addEventListener('click', function () {
-                    const recordId = this.getAttribute('data-record-id');
-                    showDetailView(recordId);
+                userCard.addEventListener('click', function () {
+                    const userId = this.getAttribute('data-user-id');
+                    showDetailView(userId);
                 });
 
-                recordsGrid.appendChild(recordCard);
+                usersGrid.appendChild(userCard);
             });
         }
 
-        // Function to truncate text to a specific length
-        function truncateText(text, maxLength) {
-            if (!text) return '';
-            return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
-        }
-
-        // Function to show detail view for a specific record
-        function showDetailView(recordId) {
-            fetch(`/get-record/${recordId}`)
+        // Function to show detail view for a specific user
+        function showDetailView(userId) {
+            fetch(`/get-user/${userId}`)
                 .then(response => response.json())
                 .then(data => {
                     // Populate the form fields
-                    document.querySelector('#record-id').value = data.record_id;
-                    document.querySelector('#name').value = data.patient_name;
-                    document.querySelector('#recordDate').value = data.record_date;
-                    document.querySelector('#conditions').value = data.conditions || '';
-                    document.querySelector('#allergies').value = data.allergies || '';
-                    document.querySelector('#medications').value = data.medications || '';
-                    document.querySelector('#notes').value = data.notes || '';
+                    document.querySelector('#user-id').value = data.user_id;
+                    document.querySelector('#username').value = data.username;
+                    document.querySelector('#role').value = data.role_id;
+                    document.querySelector('#password').value = '';
+
+                    // Show password note for existing users
+                    document.querySelector('#password-note').style.display = 'block';
 
                     // Show the detail view
                     document.querySelector('.list-view').classList.add('hidden');
                     document.querySelector('.detail-view').classList.add('active');
                     document.querySelector('.back-button').style.display = 'flex';
+
+                    // Update button text
+                    document.querySelector('#update-button').textContent = 'UPDATE';
+
+                    // Get current user ID from the hidden input field
+                    const currentUserId = parseInt(document.getElementById('current-user-id').value);
+
+                    // Show delete button for existing users (but not for current user)
+                    if (parseInt(data.user_id) !== currentUserId) {
+                        document.querySelector('#delete-button').style.display = 'block';
+                    } else {
+                        document.querySelector('#delete-button').style.display = 'none';
+                    }
 
                     // Clear any previous status messages
                     const statusMessage = document.querySelector('#status-message');
@@ -661,8 +713,41 @@
                     statusMessage.className = 'status-message';
                 })
                 .catch(error => {
-                    console.error('Error loading record details:', error);
+                    console.error('Error loading user details:', error);
                 });
+        }
+
+        // Function to show form for adding a new user
+        function showAddUserForm() {
+            // Clear the form
+            document.querySelector('#user-id').value = '';
+            document.querySelector('#username').value = '';
+            document.querySelector('#password').value = '';
+
+            // Set default role if available
+            const roleSelect = document.querySelector('#role');
+            if (roleSelect.options.length > 0) {
+                roleSelect.selectedIndex = 0;
+            }
+
+            // Hide password note for new users
+            document.querySelector('#password-note').style.display = 'none';
+
+            // Hide delete button for new users
+            document.querySelector('#delete-button').style.display = 'none';
+
+            // Show the detail view
+            document.querySelector('.list-view').classList.add('hidden');
+            document.querySelector('.detail-view').classList.add('active');
+            document.querySelector('.back-button').style.display = 'flex';
+
+            // Update button text
+            document.querySelector('#update-button').textContent = 'CREATE';
+
+            // Clear any previous status messages
+            const statusMessage = document.querySelector('#status-message');
+            statusMessage.textContent = '';
+            statusMessage.className = 'status-message';
         }
 
         // Function to show the list view
@@ -670,22 +755,53 @@
             document.querySelector('.list-view').classList.remove('hidden');
             document.querySelector('.detail-view').classList.remove('active');
             document.querySelector('.back-button').style.display = 'none';
+
+            // Refresh the user list
+            loadUsers();
         }
 
-        // Function to update a record
-        function updateRecord() {
-            const recordId = document.querySelector('#record-id').value;
+        // Function to update or create a user
+        function updateUser() {
+            const userId = document.querySelector('#user-id').value;
+            const username = document.querySelector('#username').value;
+            const roleId = document.querySelector('#role').value;
+            const password = document.querySelector('#password').value;
+
+            if (!username) {
+                const statusMessage = document.querySelector('#status-message');
+                statusMessage.textContent = 'Username is required';
+                statusMessage.className = 'status-message error';
+                return;
+            }
+
+            // For new users, password is required
+            if (!userId && !password) {
+                const statusMessage = document.querySelector('#status-message');
+                statusMessage.textContent = 'Password is required for new users';
+                statusMessage.className = 'status-message error';
+                return;
+            }
 
             const data = {
-                record_date: document.querySelector('#recordDate').value,
-                conditions: document.querySelector('#conditions').value,
-                allergies: document.querySelector('#allergies').value,
-                medications: document.querySelector('#medications').value,
-                notes: document.querySelector('#notes').value
+                username: username,
+                role_id: parseInt(roleId),
+                password: password
             };
 
-            fetch(`/update-record/${recordId}`, {
-                method: 'POST',
+            let url, method;
+
+            if (userId) {
+                // Update existing user
+                url = `/update-user/${userId}`;
+                method = 'POST';
+            } else {
+                // Create new user
+                url = '/create-user';
+                method = 'POST';
+            }
+
+            fetch(url, {
+                method: method,
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -699,17 +815,66 @@
                         statusMessage.textContent = data.message;
                         statusMessage.className = 'status-message success';
 
-                        // Refresh records in the background
-                        loadRecords();
+                        // If creating a user, update form to edit mode
+                        if (!userId && data.user_id) {
+                            document.querySelector('#user-id').value = data.user_id;
+                            document.querySelector('#password').value = '';
+                            document.querySelector('#password-note').style.display = 'block';
+                            document.querySelector('#update-button').textContent = 'UPDATE';
+
+                            // Show delete button since this is now an existing user
+                            document.querySelector('#delete-button').style.display = 'block';
+                        }
+
+                        // Refresh the user list in the background
+                        loadUsers();
                     } else {
                         statusMessage.textContent = data.error;
                         statusMessage.className = 'status-message error';
                     }
                 })
                 .catch(error => {
-                    console.error('Error updating record:', error);
+                    console.error('Error updating user:', error);
                     const statusMessage = document.querySelector('#status-message');
-                    statusMessage.textContent = 'An error occurred while updating the record.';
+                    statusMessage.textContent = 'An error occurred while updating the user.';
+                    statusMessage.className = 'status-message error';
+                });
+        }
+
+        // Function to delete a user
+        function deleteUser() {
+            const userId = document.querySelector('#user-id').value;
+            const username = document.querySelector('#username').value;
+
+            if (!userId) {
+                return;
+            }
+
+            if (!confirm(`Are you sure you want to delete the user "${username}"? This action cannot be undone.`)) {
+                return;
+            }
+
+            fetch(`/delete-user/${userId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Return to list view and refresh
+                        showListView();
+                    } else {
+                        const statusMessage = document.querySelector('#status-message');
+                        statusMessage.textContent = data.error;
+                        statusMessage.className = 'status-message error';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error deleting user:', error);
+                    const statusMessage = document.querySelector('#status-message');
+                    statusMessage.textContent = 'An error occurred while deleting the user.';
                     statusMessage.className = 'status-message error';
                 });
         }

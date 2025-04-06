@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="UTF-8">
   <title>Login - Ward Management System</title>
@@ -46,7 +47,8 @@
       margin: 20px auto;
     }
 
-    input[type=password], input[type=text] {
+    input[type=password],
+    input[type=text] {
       width: 100%;
       padding: 15px;
       margin: 10px 0;
@@ -57,7 +59,8 @@
       box-sizing: border-box;
     }
 
-    input[type=text]:focus, input[type=password]:focus {
+    input[type=text]:focus,
+    input[type=password]:focus {
       background-color: #f1f1f1;
       outline: none;
       border: 1px solid #0b3d60;
@@ -104,40 +107,54 @@
     }
 
     @keyframes fadeInForm {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
     }
   </style>
 </head>
-<body>
-<div class="main-container">
-  <!-- Flash messages -->
-  {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-      {% for category, message in messages %}
-        <div class="alert alert-{{ category }}">
-          {{ message }}
-        </div>
-      {% endfor %}
-    {% endif %}
-  {% endwith %}
 
-  <form method="POST" action="{{ url_for('auth.login') }}">
-    <h1>Login</h1>
-    <div class="divider"></div>
-    <div class="divider-thin"></div>
-    
-    <input type="text" name="username" placeholder="Username" required>
-    <input type="password" name="password" placeholder="Password" required>
-    <button type="submit">Login</button>
-    
-    <img src="CIIT-College-logo-negative.png" alt="CIIT Logo" class="logo">
-  </form>
-</div>
+<body>
+  <div class="main-container">
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }}">
+      {{ message }}
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('auth.login') }}">
+      <h1>Login</h1>
+      <div class="divider"></div>
+      <div class="divider-thin"></div>
+
+      <input type="text" name="username" placeholder="Username" required>
+      <input type="password" name="password" placeholder="Password" required>
+      <button type="submit">Login</button>
+
+      <img src="CIIT-College-logo-negative.png" alt="CIIT Logo" class="logo">
+    </form>
+  </div>
 </body>
+
 </html>
