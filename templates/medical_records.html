@@ -309,6 +309,65 @@
             outline: 2px solid #0099cc;
         }
 
+        .tab-container {
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            background: #004455;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+
+        .tab:first-child {
+            border-top-left-radius: 4px;
+            border-bottom-left-radius: 4px;
+        }
+
+        .tab:last-child {
+            border-top-right-radius: 4px;
+            border-bottom-right-radius: 4px;
+        }
+
+        .tab.active {
+            background: #0099cc;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .admissions-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+        }
+
+        .admissions-table th,
+        .admissions-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #004455;
+        }
+
+        .admissions-table th {
+            background-color: #004455;
+            font-weight: 600;
+        }
+
+        .admissions-table tr:hover {
+            background-color: #004455;
+        }
+
         .update-button {
             position: absolute;
             bottom: 24px;
@@ -357,6 +416,24 @@
             text-align: center;
             padding: 24px;
             color: rgba(255, 255, 255, 0.7);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-active {
+            background-color: #00cc99;
+            color: white;
+        }
+
+        .badge-discharged {
+            background-color: #ff5555;
+            color: white;
         }
 
         @media (max-width: 768px) {
@@ -408,6 +485,20 @@
             .status-message {
                 position: static;
                 margin-bottom: 20px;
+            }
+
+            .tab-container {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .tab {
+                border-radius: 4px !important;
+            }
+
+            .admissions-table {
+                display: block;
+                overflow-x: auto;
             }
         }
     </style>
@@ -496,224 +587,364 @@
         <!-- Detail View -->
         <div class="detail-view">
             <div class="detail-form">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="name">Name:</label>
-                        <input type="text" id="name" readonly>
-                        <input type="hidden" id="record-id">
-                    </div>
+                <div class="tab-container">
+                    <button class="tab active" data-tab="medical-info">Medical Information</button>
+                    <button class="tab" data-tab="admission-info">Admission History</button>
+                </div>
 
-                    <div class="form-group">
-                        <label for="recordDate">Record Date:</label>
-                        <input type="date" id="recordDate">
-                    </div>
+                <!-- Medical Information Tab -->
+                <div id="medical-info" class="tab-content active">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="name">Name:</label>
+                            <input type="text" id="name" readonly>
+                            <input type="hidden" id="record-id">
+                            <input type="hidden" id="patient-id">
+                        </div>
 
-                    <div class="form-group full-width">
-                        <label for="conditions">Conditions:</label>
-                        <textarea id="conditions"></textarea>
-                    </div>
+                        <div class="form-group">
+                            <label for="recordDate">Record Date:</label>
+                            <input type="date" id="recordDate">
+                        </div>
 
-                    <div class="form-group">
-                        <label for="allergies">Allergies:</label>
-                        <textarea id="allergies"></textarea>
-                    </div>
+                        <div class="form-group full-width">
+                            <label for="conditions">Conditions:</label>
+                            <textarea id="conditions"></textarea>
+                        </div>
 
-                    <div class="form-group">
-                        <label for="medications">Medication:</label>
-                        <textarea id="medications"></textarea>
-                    </div>
+                        <div class="form-group">
+                            <label for="allergies">Allergies:</label>
+                            <textarea id="allergies"></textarea>
+                        </div>
 
-                    <div class="form-group full-width">
-                        <label for="notes">Notes:</label>
-                        <textarea id="notes"></textarea>
+                        <div class="form-group">
+                            <label for="medications">Medication:</label>
+                            <textarea id="medications"></textarea>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="notes">Notes:</label>
+                            <textarea id="notes"></textarea>
+                        </div>
                     </div>
                 </div>
 
-                <button id="update-button" class="update-button">UPDATE</button>
+                <!-- Admission History Tab -->
+                <div id="admission-info" class="tab-content">
+                    <h3>Admission History</h3>
+                    <div id="admissions-container">
+                        <table class="admissions-table">
+                            <thead>
+                                <tr>
+                                    <th>Admission Date</th>
+                                    <th>Discharge Date</th>
+                                    <th>Diagnosis</th>
+                                    <th>Doctor</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admissions-table-body">
+                                <!-- Admissions will be loaded here dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <button id="update-button" class="update-button" 
+                        {% if not check_permission('update_medical_records') %}
+                        style="display: none;"
+                        {% endif %}>
+                    UPDATE
+                </button>
+
                 <div id="status-message" class="status-message"></div>
             </div>
         </div>
     </div>
 
-    <script>
-        // Load all records when the page loads
-        document.addEventListener('DOMContentLoaded', function () {
-            loadRecords();
+<script>
+    // Define user permissions for JavaScript use
+    window.userPermissions = {
+        canUpdateRecords: {{ check_permission('update_medical_records')|tojson }},
+        canViewRecords: {{ check_permission('view_medical_records')|tojson }}
+    };
 
-            // Add event listeners
-            document.querySelector('#search-button').addEventListener('click', searchRecords);
-            document.querySelector('#search-input').addEventListener('keypress', function (e) {
-                if (e.key === 'Enter') {
-                    searchRecords();
-                }
-            });
-
-            document.querySelector('.back-button').addEventListener('click', showListView);
-            document.querySelector('#update-button').addEventListener('click', updateRecord);
-        });
-
-        // Function to load all records
-        function loadRecords() {
-            // Check if there's a patient filter in the URL
-            const urlParams = new URLSearchParams(window.location.search);
-            const patientId = urlParams.get('patient');
-
-            // If patient ID is specified, search for that patient's records
-            if (patientId) {
-                fetch(`/search-records?patient=${patientId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        displayRecords(data);
-                    })
-                    .catch(error => {
-                        console.error('Error loading patient records:', error);
-                    });
-            } else {
-                // Otherwise load all records
-                fetch('/search-records')
-                    .then(response => response.json())
-                    .then(data => {
-                        displayRecords(data);
-                    })
-                    .catch(error => {
-                        console.error('Error loading records:', error);
-                    });
-            }
+    // Load all records when the page loads
+    document.addEventListener('DOMContentLoaded', function () {
+        // Check if user has permission to view records, if not show error
+        if (!window.userPermissions.canViewRecords) {
+            document.querySelector('.main-content').innerHTML = 
+                '<div style="text-align: center; padding: 30px; color: white; background: #003344; margin: 24px; border-radius: 12px;">' +
+                '<h3>You do not have permission to view medical records.</h3>' +
+                '</div>';
+            return;
         }
 
-        // Function to search records
-        function searchRecords() {
-            const searchTerm = document.querySelector('#search-input').value;
+        loadRecords();
 
-            fetch(`/search-records?query=${encodeURIComponent(searchTerm)}`)
+        // Add event listeners
+        document.querySelector('#search-button').addEventListener('click', searchRecords);
+        document.querySelector('#search-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                searchRecords();
+            }
+        });
+
+        document.querySelector('.back-button').addEventListener('click', showListView);
+        
+        // Only add update button event listener if user has permission
+        if (window.userPermissions.canUpdateRecords) {
+            document.querySelector('#update-button').addEventListener('click', updateRecord);
+        } else {
+            // Hide the update button if user doesn't have permission
+            document.querySelector('#update-button').style.display = 'none';
+        }
+
+        // Tab functionality
+        const tabs = document.querySelectorAll('.tab');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                // Remove active class from all tabs and tab contents
+                tabs.forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                
+                // Add active class to clicked tab and corresponding content
+                this.classList.add('active');
+                const tabId = this.getAttribute('data-tab');
+                document.getElementById(tabId).classList.add('active');
+                
+                // Show or hide update button based on active tab and permissions
+                if (tabId === 'medical-info' && window.userPermissions.canUpdateRecords) {
+                    document.getElementById('update-button').style.display = 'block';
+                } else {
+                    document.getElementById('update-button').style.display = 'none';
+                }
+            });
+        });
+    });
+
+    // Function to load all records
+    function loadRecords() {
+        // Check if there's a patient filter in the URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const patientId = urlParams.get('patient');
+
+        // If patient ID is specified, search for that patient's records
+        if (patientId) {
+            fetch(`/search-records?patient=${patientId}`)
                 .then(response => response.json())
                 .then(data => {
                     displayRecords(data);
                 })
                 .catch(error => {
-                    console.error('Error searching records:', error);
+                    console.error('Error loading patient records:', error);
                 });
-        }
-
-        // Function to display records in the grid
-        function displayRecords(records) {
-            const recordsGrid = document.querySelector('#records-grid');
-            recordsGrid.innerHTML = '';
-
-            if (records.length === 0) {
-                recordsGrid.innerHTML = '<div class="no-records">No records found</div>';
-                return;
-            }
-
-            records.forEach(record => {
-                const recordCard = document.createElement('div');
-                recordCard.className = 'record-card';
-                recordCard.setAttribute('data-record-id', record.record_id);
-
-                recordCard.innerHTML = `
-                    <div class="record-header">
-                        <span class="record-title">${record.patient_name}</span>
-                        <span class="record-date">${record.record_date}</span>
-                    </div>
-                    <div class="record-content">
-                        <p>${record.conditions ? 'Conditions: ' + truncateText(record.conditions, 30) : 'No conditions recorded'}</p>
-                        <p>${record.medications ? 'Medications: ' + truncateText(record.medications, 30) : 'No medications recorded'}</p>
-                    </div>
-                `;
-
-                recordCard.addEventListener('click', function () {
-                    const recordId = this.getAttribute('data-record-id');
-                    showDetailView(recordId);
-                });
-
-                recordsGrid.appendChild(recordCard);
-            });
-        }
-
-        // Function to truncate text to a specific length
-        function truncateText(text, maxLength) {
-            if (!text) return '';
-            return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
-        }
-
-        // Function to show detail view for a specific record
-        function showDetailView(recordId) {
-            fetch(`/get-record/${recordId}`)
+        } else {
+            // Otherwise load all records
+            fetch('/search-records')
                 .then(response => response.json())
                 .then(data => {
-                    // Populate the form fields
-                    document.querySelector('#record-id').value = data.record_id;
-                    document.querySelector('#name').value = data.patient_name;
-                    document.querySelector('#recordDate').value = data.record_date;
-                    document.querySelector('#conditions').value = data.conditions || '';
-                    document.querySelector('#allergies').value = data.allergies || '';
-                    document.querySelector('#medications').value = data.medications || '';
-                    document.querySelector('#notes').value = data.notes || '';
-
-                    // Show the detail view
-                    document.querySelector('.list-view').classList.add('hidden');
-                    document.querySelector('.detail-view').classList.add('active');
-                    document.querySelector('.back-button').style.display = 'flex';
-
-                    // Clear any previous status messages
-                    const statusMessage = document.querySelector('#status-message');
-                    statusMessage.textContent = '';
-                    statusMessage.className = 'status-message';
+                    displayRecords(data);
                 })
                 .catch(error => {
-                    console.error('Error loading record details:', error);
+                    console.error('Error loading records:', error);
                 });
         }
+    }
 
-        // Function to show the list view
-        function showListView() {
-            document.querySelector('.list-view').classList.remove('hidden');
-            document.querySelector('.detail-view').classList.remove('active');
-            document.querySelector('.back-button').style.display = 'none';
-        }
+    // Function to search records
+    function searchRecords() {
+        const searchTerm = document.querySelector('#search-input').value;
 
-        // Function to update a record
-        function updateRecord() {
-            const recordId = document.querySelector('#record-id').value;
-
-            const data = {
-                record_date: document.querySelector('#recordDate').value,
-                conditions: document.querySelector('#conditions').value,
-                allergies: document.querySelector('#allergies').value,
-                medications: document.querySelector('#medications').value,
-                notes: document.querySelector('#notes').value
-            };
-
-            fetch(`/update-record/${recordId}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data)
+        fetch(`/search-records?query=${encodeURIComponent(searchTerm)}`)
+            .then(response => response.json())
+            .then(data => {
+                displayRecords(data);
             })
-                .then(response => response.json())
-                .then(data => {
-                    const statusMessage = document.querySelector('#status-message');
+            .catch(error => {
+                console.error('Error searching records:', error);
+            });
+    }
 
-                    if (data.success) {
-                        statusMessage.textContent = data.message;
-                        statusMessage.className = 'status-message success';
+    // Function to display records in the grid
+    function displayRecords(records) {
+        const recordsGrid = document.querySelector('#records-grid');
+        recordsGrid.innerHTML = '';
 
-                        // Refresh records in the background
-                        loadRecords();
-                    } else {
-                        statusMessage.textContent = data.error;
-                        statusMessage.className = 'status-message error';
-                    }
-                })
-                .catch(error => {
-                    console.error('Error updating record:', error);
-                    const statusMessage = document.querySelector('#status-message');
-                    statusMessage.textContent = 'An error occurred while updating the record.';
-                    statusMessage.className = 'status-message error';
-                });
+        if (records.length === 0) {
+            recordsGrid.innerHTML = '<div class="no-records">No records found</div>';
+            return;
         }
-    </script>
+
+        records.forEach(record => {
+            const recordCard = document.createElement('div');
+            recordCard.className = 'record-card';
+            recordCard.setAttribute('data-record-id', record.record_id);
+            recordCard.setAttribute('data-patient-id', record.patient_id);
+
+            recordCard.innerHTML = `
+                <div class="record-header">
+                    <span class="record-title">${record.patient_name}</span>
+                    <span class="record-date">${record.record_date}</span>
+                </div>
+                <div class="record-content">
+                    <p>${record.conditions ? 'Conditions: ' + truncateText(record.conditions, 30) : 'No conditions recorded'}</p>
+                    <p>${record.medications ? 'Medications: ' + truncateText(record.medications, 30) : 'No medications recorded'}</p>
+                </div>
+            `;
+
+            recordCard.addEventListener('click', function () {
+                const recordId = this.getAttribute('data-record-id');
+                showDetailView(recordId);
+            });
+
+            recordsGrid.appendChild(recordCard);
+        });
+    }
+
+    // Function to truncate text to a specific length
+    function truncateText(text, maxLength) {
+        if (!text) return '';
+        return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+    }
+
+    // Function to show detail view for a specific record
+    function showDetailView(recordId) {
+        fetch(`/get-record-with-admission/${recordId}`)
+            .then(response => response.json())
+            .then(data => {
+                // Populate the form fields for medical information
+                document.querySelector('#record-id').value = data.record_id;
+                document.querySelector('#patient-id').value = data.patient_id;
+                document.querySelector('#name').value = data.patient_name;
+                document.querySelector('#recordDate').value = data.record_date;
+                document.querySelector('#conditions').value = data.conditions || '';
+                document.querySelector('#allergies').value = data.allergies || '';
+                document.querySelector('#medications').value = data.medications || '';
+                document.querySelector('#notes').value = data.notes || '';
+                
+                // If user can't update records, make fields readonly
+                if (!window.userPermissions.canUpdateRecords) {
+                    document.querySelector('#recordDate').readOnly = true;
+                    document.querySelector('#conditions').readOnly = true;
+                    document.querySelector('#allergies').readOnly = true;
+                    document.querySelector('#medications').readOnly = true;
+                    document.querySelector('#notes').readOnly = true;
+                }
+
+                // Populate admission history
+                const admissionsTableBody = document.querySelector('#admissions-table-body');
+                admissionsTableBody.innerHTML = '';
+
+                if (data.admissions && data.admissions.length > 0) {
+                    data.admissions.forEach(admission => {
+                        const row = document.createElement('tr');
+                        
+                        // Create badge class based on status
+                        const statusBadgeClass = admission.status === 'Active' ? 'badge-active' : 'badge-discharged';
+                        
+                        row.innerHTML = `
+                            <td>${admission.admission_date}</td>
+                            <td>${admission.discharge_date}</td>
+                            <td>${admission.diagnosis || 'N/A'}</td>
+                            <td>${admission.doctor}</td>
+                            <td><span class="badge ${statusBadgeClass}">${admission.status}</span></td>
+                        `;
+                        
+                        admissionsTableBody.appendChild(row);
+                    });
+                } else {
+                    admissionsTableBody.innerHTML = `
+                        <tr>
+                            <td colspan="5" style="text-align: center;">No admission history found</td>
+                        </tr>
+                    `;
+                }
+
+                // Show the detail view
+                document.querySelector('.list-view').classList.add('hidden');
+                document.querySelector('.detail-view').classList.add('active');
+                document.querySelector('.back-button').style.display = 'flex';
+
+                // Ensure medical info tab is active by default
+                document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                document.querySelector('.tab[data-tab="medical-info"]').classList.add('active');
+                document.getElementById('medical-info').classList.add('active');
+                
+                // Show update button only if user has permission and medical tab is active
+                document.getElementById('update-button').style.display = 
+                    (window.userPermissions.canUpdateRecords) ? 'block' : 'none';
+
+                // Clear any previous status messages
+                const statusMessage = document.querySelector('#status-message');
+                statusMessage.textContent = '';
+                statusMessage.className = 'status-message';
+            })
+            .catch(error => {
+                console.error('Error loading record details:', error);
+            });
+    }
+
+    // Function to show the list view
+    function showListView() {
+        document.querySelector('.list-view').classList.remove('hidden');
+        document.querySelector('.detail-view').classList.remove('active');
+        document.querySelector('.back-button').style.display = 'none';
+    }
+
+    // Function to update a record
+    function updateRecord() {
+        // Check if user has permission
+        if (!window.userPermissions.canUpdateRecords) {
+            const statusMessage = document.querySelector('#status-message');
+            statusMessage.textContent = 'You do not have permission to update medical records.';
+            statusMessage.className = 'status-message error';
+            return;
+        }
+        
+        const recordId = document.querySelector('#record-id').value;
+
+        const data = {
+            record_date: document.querySelector('#recordDate').value,
+            conditions: document.querySelector('#conditions').value,
+            allergies: document.querySelector('#allergies').value,
+            medications: document.querySelector('#medications').value,
+            notes: document.querySelector('#notes').value
+        };
+
+        fetch(`/update-record/${recordId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        })
+            .then(response => response.json())
+            .then(data => {
+                const statusMessage = document.querySelector('#status-message');
+
+                if (data.success) {
+                    statusMessage.textContent = data.message;
+                    statusMessage.className = 'status-message success';
+
+                    // Refresh records in the background
+                    loadRecords();
+                } else {
+                    statusMessage.textContent = data.error;
+                    statusMessage.className = 'status-message error';
+                }
+            })
+            .catch(error => {
+                console.error('Error updating record:', error);
+                const statusMessage = document.querySelector('#status-message');
+                statusMessage.textContent = 'An error occurred while updating the record.';
+                statusMessage.className = 'status-message error';
+            });
+    }
+</script>
 </body>
 
 </html>

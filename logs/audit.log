@@ -1,0 +1,3 @@
+{"timestamp": "2025-04-08 21:38:03", "user_id": 1, "username": "admin1", "entity_type": "patient", "entity_id": 18, "action": "update", "details": {"changes": {"first_name": {"old": "Penn", "new": "Penny"}}, "patient_name": "Penny Adams"}}
+{"timestamp": "2025-04-08 21:49:49", "user_id": 1, "username": "admin1", "entity_type": "bed", "entity_id": 45, "action": "update", "details": {"bed_number": 1503, "ward_id": 15, "ward_name": "Burn Ward A", "changes": {"status": {"old": "Cleaning", "new": "Maintenance"}}}}
+{"timestamp": "2025-04-08 21:52:34", "user_id": 1, "username": "admin1", "entity_type": "patient", "entity_id": 26, "action": "update", "details": {"changes": {"last_name": {"old": "Test", "new": "Testy"}}, "patient_name": "Test Testy"}}

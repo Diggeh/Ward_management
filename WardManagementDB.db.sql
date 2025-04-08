@@ -3,13 +3,13 @@ CREATE TABLE IF NOT EXISTS "Admissions" (
 	"AdmissionID"	INTEGER,
 	"PatientID"	INTEGER,
 	"BedID"	INTEGER,
+	"DoctorID"	INTEGER,
 	"AdmissionDate"	DATE NOT NULL,
 	"DischargeDate"	DATE,
 	"Diagnosis"	TEXT,
-	"DoctorInCharge"	TEXT,
-	"doctor_id"	INTEGER,
 	PRIMARY KEY("AdmissionID" AUTOINCREMENT),
 	FOREIGN KEY("BedID") REFERENCES "Beds"("BedID"),
+	FOREIGN KEY("DoctorID") REFERENCES "",
 	FOREIGN KEY("PatientID") REFERENCES "Patients"("PatientID")
 );
 CREATE TABLE IF NOT EXISTS "Beds" (
@@ -75,26 +75,29 @@ CREATE TABLE IF NOT EXISTS "users" (
 	PRIMARY KEY("id" AUTOINCREMENT),
 	FOREIGN KEY("role_id") REFERENCES "roles"("id")
 );
-INSERT INTO "Admissions" VALUES (1,1,1,'2023-10-01','2023-10-05','Appendicitis','doctor1',2);
-INSERT INTO "Admissions" VALUES (2,2,2,'2023-10-02',NULL,'Pneumonia','doctor1',2);
-INSERT INTO "Admissions" VALUES (3,3,3,'2023-10-03',NULL,'Heart Attack','doctor1',2);
-INSERT INTO "Admissions" VALUES (4,4,4,'2023-10-04','2023-10-06','Fractured Leg','doctor1',1);
-INSERT INTO "Admissions" VALUES (5,5,5,'2023-10-05',NULL,'Diabetes','doctor1',1);
-INSERT INTO "Admissions" VALUES (6,6,6,'2023-10-06','2023-10-08','Hypertension','doctor1',2);
-INSERT INTO "Admissions" VALUES (7,7,7,'2023-10-07',NULL,'Asthma','doctor1',2);
-INSERT INTO "Admissions" VALUES (8,8,8,'2023-10-08','2023-10-10','Migraine','doctor1',2);
-INSERT INTO "Admissions" VALUES (9,9,9,'2023-10-09',NULL,'Bronchitis','doctor1',2);
-INSERT INTO "Admissions" VALUES (10,10,10,'2023-10-10','2023-10-12','Arthritis','doctor1',2);
-INSERT INTO "Admissions" VALUES (11,11,11,'2023-10-11',NULL,'Flu','doctor1',2);
-INSERT INTO "Admissions" VALUES (12,12,12,'2023-10-12','2023-10-14','Gastritis','doctor1',2);
-INSERT INTO "Admissions" VALUES (13,13,13,'2023-10-13',NULL,'Sinusitis','doctor1',2);
-INSERT INTO "Admissions" VALUES (14,14,14,'2023-10-14','2023-10-16','Tonsillitis','doctor1',2);
-INSERT INTO "Admissions" VALUES (15,15,15,'2023-10-15',NULL,'Malaria','doctor1',2);
-INSERT INTO "Admissions" VALUES (16,16,16,'2023-10-16','2023-10-18','Typhoid','doctor1',2);
-INSERT INTO "Admissions" VALUES (17,17,17,'2023-10-17',NULL,'Dengue','doctor1',2);
-INSERT INTO "Admissions" VALUES (18,18,18,'2023-10-18','2023-10-20','Cholera','doctor1',2);
-INSERT INTO "Admissions" VALUES (19,19,19,'2023-10-19',NULL,'Tuberculosis','doctor1',2);
-INSERT INTO "Admissions" VALUES (20,20,20,'2023-10-20','2023-10-22','COVID-19','doctor1',2);
+INSERT INTO "Admissions" VALUES (1,1,1,2,'2023-10-01','2023-10-05','Appendicitis');
+INSERT INTO "Admissions" VALUES (2,2,2,2,'2023-10-02',NULL,'Pneumonia');
+INSERT INTO "Admissions" VALUES (3,3,3,2,'2023-10-03',NULL,'Heart Attack');
+INSERT INTO "Admissions" VALUES (4,4,4,1,'2023-10-04','2023-10-06','Fractured Leg');
+INSERT INTO "Admissions" VALUES (5,5,5,1,'2023-10-05',NULL,'Diabetes');
+INSERT INTO "Admissions" VALUES (6,6,6,2,'2023-10-06','2023-10-08','Hypertension');
+INSERT INTO "Admissions" VALUES (7,7,7,2,'2023-10-07',NULL,'Asthma');
+INSERT INTO "Admissions" VALUES (8,8,8,2,'2023-10-08','2023-10-10','Migraine');
+INSERT INTO "Admissions" VALUES (9,9,9,2,'2023-10-09',NULL,'Bronchitis');
+INSERT INTO "Admissions" VALUES (10,10,10,2,'2023-10-10','2023-10-12','Arthritis');
+INSERT INTO "Admissions" VALUES (11,11,11,2,'2023-10-11',NULL,'Flu');
+INSERT INTO "Admissions" VALUES (12,12,12,2,'2023-10-12','2023-10-14','Gastritis');
+INSERT INTO "Admissions" VALUES (13,13,13,2,'2023-10-13',NULL,'Sinusitis');
+INSERT INTO "Admissions" VALUES (14,14,14,2,'2023-10-14','2023-10-16','Tonsillitis');
+INSERT INTO "Admissions" VALUES (15,15,15,2,'2023-10-15',NULL,'Malaria');
+INSERT INTO "Admissions" VALUES (16,16,16,2,'2023-10-16','2023-10-18','Typhoid');
+INSERT INTO "Admissions" VALUES (17,17,17,2,'2023-10-17',NULL,'Dengue');
+INSERT INTO "Admissions" VALUES (18,18,18,2,'2023-10-18','2023-10-20','Cholera');
+INSERT INTO "Admissions" VALUES (19,19,19,2,'2023-10-19',NULL,'Tuberculosis');
+INSERT INTO "Admissions" VALUES (20,20,20,2,'2023-10-20','2023-10-22','COVID-19');
+INSERT INTO "Admissions" VALUES (23,23,59,2,'2025-04-06','2025-04-06','Skill issue
+');
+INSERT INTO "Admissions" VALUES (25,25,8,2,'2025-04-06','2025-04-06','Huge gash on left forearm');
 INSERT INTO "Beds" VALUES (1,1,101,'Occupied');
 INSERT INTO "Beds" VALUES (2,1,102,'Vacant');
 INSERT INTO "Beds" VALUES (3,1,103,'Cleaning');
@@ -175,6 +178,7 @@ INSERT INTO "MedicalRecords" VALUES (17,17,'2023-10-17','None','Pneumonia','Azit
 INSERT INTO "MedicalRecords" VALUES (18,18,'2023-10-18','None','Heart Attack','Aspirin','Patient is in critical condition.');
 INSERT INTO "MedicalRecords" VALUES (19,19,'2023-10-19','None','Fractured Leg','Acetaminophen','Patient is in a cast.');
 INSERT INTO "MedicalRecords" VALUES (20,20,'2023-10-20','None','Flu','Oseltamivir','Patient has a fever, cough and body ache.');
+INSERT INTO "MedicalRecords" VALUES (22,25,'2025-04-06','N/A','N/A','Ibuprofen','TEst');
 INSERT INTO "Patients" VALUES (1,'John','Doe','1985-05-15','Male',1234567890,9876543210,'123 Main St, CityA');
 INSERT INTO "Patients" VALUES (2,'Jane','Smith','1990-08-22','Female',2345678901,8765432109,'456 Elm St, CityB');
 INSERT INTO "Patients" VALUES (3,'Alice','Johnson','1978-12-10','Female',3456789012,7654321098,'789 Oak St, CityC');
@@ -195,6 +199,8 @@ INSERT INTO "Patients" VALUES (17,'Oscar','Scott','1991-05-30','Male',8901276543
 INSERT INTO "Patients" VALUES (18,'Penny','Adams','1989-11-12','Female',9012387654,1098765432,'666 Hill St, CityR');
 INSERT INTO "Patients" VALUES (19,'Quincy','Nelson','1977-04-05','Male',1234598765,9876543210,'777 Lake St, CityS');
 INSERT INTO "Patients" VALUES (20,'Rachel','Carter','1994-09-09','Female',2345609876,8765432109,'888 Park St, CityT');
+INSERT INTO "Patients" VALUES (23,'test','test','2023-04-05','Male',1231231234,1231231234,'earth');
+INSERT INTO "Patients" VALUES (25,'Aerown John','Tamayo','2006-02-05','Male',101010101101001,19191919191919,'kunwati');
 INSERT INTO "Wards" VALUES (1,'General Ward A',20,'General');
 INSERT INTO "Wards" VALUES (2,'General Ward B',15,'General');
 INSERT INTO "Wards" VALUES (3,'Emergency Ward A',10,'Emergency');
