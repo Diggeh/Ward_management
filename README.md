@@ -26,7 +26,7 @@ Flask - for python-based web framework
 Flask-login - is used for authentication
 SQLAlchemy - as ORM for database interactions
 
-**DATABASE **
+**DATABASE**
 SQLite
 
 **PAGES**
