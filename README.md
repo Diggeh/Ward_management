@@ -32,7 +32,7 @@ SQLite
 ## **PAGES**
 Login\
 Dashboard\
-Patient Page\ 
+Patient Page\
 Ward Page\
 Medical Records Page\
 Admin Dashboard\
