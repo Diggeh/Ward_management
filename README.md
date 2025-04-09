@@ -28,6 +28,7 @@ SQLAlchemy - as ORM for database interactions
 
 ### **DATABASE**
 SQLite
+![Relational Model Diagram](Relational_Diagram.png)
 
 ## **PAGES**
 Login\
