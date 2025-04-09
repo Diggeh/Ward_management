@@ -8,7 +8,7 @@ Flask-login\
 SQLAlchemy 
 
 How to run:
-Run by python app.py then access the link given in console\
+Run by python app.py in command prompt then access the link given in console\
 logins: (user | pass)\
 admin1 | adminpass\
 doctor1 | doctorpass\
