@@ -20,7 +20,7 @@ Jinja2 Template Engine - for rendering dynamic content\
 AJAX - for asynchronous requests
 
 ### **BACKEND**
-Works by powering the front-end via API endpoints where it receives requests from the front end, and processes that data and interacts and pushes changes within the database, then returning a response to the front end. Includes different modules for initializing the Flask application, database, handling api and logic, and mapping classes to database entities.
+Works by powering the front-end via API endpoints where it receives requests from the front end, and processes that data, interacting and pushing changes within the database, then returning a response to the front end. Includes different modules for initializing the Flask application, database, handling api and logic, and mapping classes to database entities.
 
 Flask - for python-based web framework\
 Flask-login - is used for authentication\
