@@ -44,7 +44,7 @@ Supports password hashing, check constraints for CRUD operations, role-based per
 
 **ROLE-BASED ACCESS**
 Admin - has access to every feature\
-Doctor - view, admit, discharge, update patient and medical records\ 
+Doctor - view, admit, discharge, update patient and medical records\
 Nurse - admit, view, update patients, view medical records, update
 
 
