@@ -37,7 +37,7 @@ Ward Page\
 Medical Records Page\
 Admin Dashboard\
 Users Page\ 
-Audit Logs\ 
+Audit Logs
 
 ## **SECURITY**
 Supports password hashing, check constraints for CRUD operations, role-based permissions, and audit logs.
@@ -45,7 +45,7 @@ Supports password hashing, check constraints for CRUD operations, role-based per
 **ROLE-BASED ACCESS**
 Admin - has access to every feature\
 Doctor - view, admit, discharge, update patient and medical records\ 
-Nurse - admit, view, update patients, view medical records, update\
+Nurse - admit, view, update patients, view medical records, update
 
 
 
