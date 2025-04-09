@@ -11,13 +11,17 @@ How to run:
 run by python app.py then access the link given in console
 
 **ARCHITECTURE**
-FRONT END
+**FRONT END**
+Works by having html templates for each page, where information is dynamically rendered by Flask. Provides interface for CRUD operations, handled by form submissions and buttons that trigger API calls to the backend.
+
 HTML/CSS
 JavaScript
 Jinja2 Template Engine - for rendering dynamic content
 AJAX - for asynchronous requests
 
 **BACKEND**
+Works by powering the front-end via API endpoints where it receives requests from the front end, and processes that data and interacts and pushes changes within the database, then returning a response to the front end. Includes different modules for initializing the Flask application, database, handling api and logic, and mapping classes to database entities.
+
 Flask - for python-based web framework
 Flask-login - is used for authentication
 SQLAlchemy - as ORM for database interactions
