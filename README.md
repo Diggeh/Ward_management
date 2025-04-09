@@ -36,7 +36,7 @@ Patient Page\
 Ward Page\
 Medical Records Page\
 Admin Dashboard\
-Users Page\ 
+Users Page\
 Audit Logs
 
 ## **SECURITY**
