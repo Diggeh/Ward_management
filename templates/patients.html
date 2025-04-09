@@ -502,240 +502,286 @@
                   <div class="button-group">
                      <button id="update-button" class="update-button">UPDATE</button>
                      <button id="discharge-button" class="action-button discharge-button">DISCHARGE</button>
-                     <button id="medical-records-button" class="action-button records-button">MEDICAL
-                     RECORDS</button>
+                     <button id="medical-records-button" class="action-button records-button">MEDICAL RECORDS</button>
+                     {% if user.role_id == 1 %} 
+                     <button id="delete-button" class="action-button delete-button">DELETE</button>
+                     {% endif %}
                   </div>
                </div>
                <div id="status-message" class="status-message"></div>
             </div>
          </div>
       </div>
-      <script>
-         // Load all patients when the page loads
-         document.addEventListener('DOMContentLoaded', function () {
-             loadPatients();
-         
-             // Add event listeners
-             document.querySelector('#search-button').addEventListener('click', searchPatients);
-             document.querySelector('#search-input').addEventListener('keypress', function (e) {
-                 if (e.key === 'Enter') {
-                     searchPatients();
-                 }
-             });
-         
-             document.querySelector('.back-button').addEventListener('click', showListView);
-             document.querySelector('#update-button').addEventListener('click', updatePatient);
-             
-             // Only add discharge button event listener if user has permission
-             {% if check_permission('discharge_patient') %}
-             document.querySelector('#discharge-button').addEventListener('click', dischargePatient);
-             {% else %}
-             // Hide the discharge button if user doesn't have permission
-             document.querySelector('#discharge-button').style.display = 'none';
-             {% endif %}
-             
-             document.querySelector('#medical-records-button').addEventListener('click', viewMedicalRecords);
-         
-             // Define user permissions for JavaScript use
-             window.userPermissions = {
-                 canDischargePatients: {{ check_permission('discharge_patient')|tojson }},
-                 canViewRecords: {{ check_permission('view_medical_records')|tojson }}
-             };
-         });
-         
-         // Function to load all patients
-         function loadPatients() {
-             fetch('/search-patients')
-                 .then(response => response.json())
-                 .then(data => {
-                     displayPatients(data);
-                 })
-                 .catch(error => {
-                     console.error('Error loading patients:', error);
-                 });
-         }
-         
-         // Function to search patients
-         function searchPatients() {
-             const searchTerm = document.querySelector('#search-input').value;
-         
-             fetch(`/search-patients?query=${encodeURIComponent(searchTerm)}`)
-                 .then(response => response.json())
-                 .then(data => {
-                     displayPatients(data);
-                 })
-                 .catch(error => {
-                     console.error('Error searching patients:', error);
-                 });
-         }
-         
-         // Function to display patients in the grid
-         function displayPatients(patients) {
-             const patientsGrid = document.querySelector('#patients-grid');
-             patientsGrid.innerHTML = '';
-         
-             if (patients.length === 0) {
-                 patientsGrid.innerHTML = '<div class="no-patients">No patients found</div>';
-                 return;
-             }
-         
-             patients.forEach(patient => {
-                 const patientCard = document.createElement('div');
-                 patientCard.className = 'patient-card';
-                 patientCard.setAttribute('data-patient-id', patient.patient_id);
-         
-                 patientCard.innerHTML = `
-                     <div class="patient-header">
-                         <span class="patient-title">${patient.patient_name}</span>
-                         <span class="patient-info">${patient.gender}, ${patient.dob}</span>
-                     </div>
-                     <div class="patient-content">
-                         <p>Contact: ${patient.contact || 'Not provided'}</p>
-                         <p>Emergency: ${patient.emergency_contact || 'Not provided'}</p>
-                     </div>
-                 `;
-         
-                 patientCard.addEventListener('click', function () {
-                     const patientId = this.getAttribute('data-patient-id');
-                     showDetailView(patientId);
-                 });
-         
-                 patientsGrid.appendChild(patientCard);
-             });
-         }
-         
-         // Function to show detail view for a specific patient
-         function showDetailView(patientId) {
-             fetch(`/get-patient/${patientId}`)
-                 .then(response => response.json())
-                 .then(data => {
-                     // Populate the form fields
-                     document.querySelector('#patient-id').value = data.patient_id;
-                     document.querySelector('#first-name').value = data.first_name;
-                     document.querySelector('#last-name').value = data.last_name;
-                     document.querySelector('#gender').value = data.gender;
-                     document.querySelector('#dob').value = data.dob;
-                     document.querySelector('#contact').value = data.contact || '';
-                     document.querySelector('#emergency-contact').value = data.emergency_contact || '';
-                     document.querySelector('#address').value = data.address || '';
-         
-                     // Show the detail view
-                     document.querySelector('.list-view').classList.add('hidden');
-                     document.querySelector('.detail-view').classList.add('active');
-                     document.querySelector('.back-button').style.display = 'flex';
-         
-                     // Clear any previous status messages
-                     const statusMessage = document.querySelector('#status-message');
-                     statusMessage.textContent = '';
-                     statusMessage.className = 'status-message';
-                 })
-                 .catch(error => {
-                     console.error('Error loading patient details:', error);
-                 });
-         }
-         
-         // Function to show the list view
-         function showListView() {
-             document.querySelector('.list-view').classList.remove('hidden');
-             document.querySelector('.detail-view').classList.remove('active');
-             document.querySelector('.back-button').style.display = 'none';
-         }
-         
-         // Function to update a patient
-         function updatePatient() {
-             const patientId = document.querySelector('#patient-id').value;
-         
-             const data = {
-                 first_name: document.querySelector('#first-name').value,
-                 last_name: document.querySelector('#last-name').value,
-                 gender: document.querySelector('#gender').value,
-                 dob: document.querySelector('#dob').value,
-                 contact: document.querySelector('#contact').value,
-                 emergency_contact: document.querySelector('#emergency-contact').value,
-                 address: document.querySelector('#address').value
-             };
-         
-             fetch(`/update-patient/${patientId}`, {
-                 method: 'POST',
-                 headers: {
-                     'Content-Type': 'application/json',
-                 },
-                 body: JSON.stringify(data)
-             })
-                 .then(response => response.json())
-                 .then(data => {
-                     const statusMessage = document.querySelector('#status-message');
-         
-                     if (data.success) {
-                         statusMessage.textContent = data.message;
-                         statusMessage.className = 'status-message success';
-         
-                         // Refresh patients in the background
-                         loadPatients();
-                     } else {
-                         statusMessage.textContent = data.error;
-                         statusMessage.className = 'status-message error';
-                     }
-                 })
-                 .catch(error => {
-                     console.error('Error updating patient:', error);
-                     const statusMessage = document.querySelector('#status-message');
-                     statusMessage.textContent = 'An error occurred while updating the patient.';
-                     statusMessage.className = 'status-message error';
-                 });
-         }
-         
-         function dischargePatient() {
-             // Check if user has permission
-             if (!window.userPermissions.canDischargePatients) {
-                 const statusMessage = document.querySelector('#status-message');
-                 statusMessage.textContent = 'You do not have permission to discharge patients.';
-                 statusMessage.className = 'status-message error';
-                 return;
-             }
-             
-             const patientId = document.querySelector('#patient-id').value;
-             const patientName = `${document.querySelector('#first-name').value} ${document.querySelector('#last-name').value}`;
-         
-             // Confirm before discharging
-             if (!confirm(`Are you sure you want to discharge ${patientName}?`)) {
-                 return;
-             }
-         
-             fetch(`/discharge-patient/${patientId}`, {
-                 method: 'POST',
-                 headers: {
-                     'Content-Type': 'application/json',
-                 }
-             })
-                 .then(response => response.json())
-                 .then(data => {
-                     const statusMessage = document.querySelector('#status-message');
-         
-                     if (data.success) {
-                         statusMessage.textContent = data.message;
-                         statusMessage.className = 'status-message success';
-         
-                         // Refresh patients in the background and return to list view after a delay
-                         loadPatients();
-                         setTimeout(showListView, 2000);
-                     } else {
-                         statusMessage.textContent = data.error || 'Error discharging patient.';
-                         statusMessage.className = 'status-message error';
-                     }
-                 })
-                 .catch(error => {
-                     console.error('Error discharging patient:', error);
-                     const statusMessage = document.querySelector('#status-message');
-                     statusMessage.textContent = 'An error occurred while discharging the patient.';
-                     statusMessage.className = 'status-message error';
-                 });
-         }
-         
-         function viewMedicalRecords() {
-             const patientId = document.querySelector('#patient-id').value;
-             window.location.href = `/medical-records?patient=${patientId}`;
-         }
-      </script>
+    <script>
+        // Load all patients when the page loads
+        document.addEventListener('DOMContentLoaded', function () {
+            loadPatients();
+        
+            // Add event listeners
+            document.querySelector('#search-button').addEventListener('click', searchPatients);
+            document.querySelector('#search-input').addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    searchPatients();
+                }
+            });
+        
+            document.querySelector('.back-button').addEventListener('click', showListView);
+            document.querySelector('#update-button').addEventListener('click', updatePatient);
+            
+            // Only add discharge button event listener if user has permission
+            {% if check_permission('discharge_patient') %}
+            document.querySelector('#discharge-button').addEventListener('click', dischargePatient);
+            {% else %}
+            // Hide the discharge button if user doesn't have permission
+            document.querySelector('#discharge-button').style.display = 'none';
+            {% endif %}
+            
+            document.querySelector('#medical-records-button').addEventListener('click', viewMedicalRecords);
+        
+            // Add delete button event listener if it exists (for admins only)
+            const deleteButton = document.getElementById('delete-button');
+            if (deleteButton) {
+                deleteButton.addEventListener('click', function() {
+                    const patientId = document.querySelector('#patient-id').value;
+                    const firstName = document.querySelector('#first-name').value;
+                    const lastName = document.querySelector('#last-name').value;
+                    const patientName = `${firstName} ${lastName}`;
+                    
+                    // Show confirmation dialog
+                    if (confirm(`Are you sure you want to delete patient ${patientName}? This action cannot be undone.`)) {
+                        // Send delete request
+                        deletePatient(patientId);
+                    }
+                });
+            }
+
+            // Define user permissions for JavaScript use
+            window.userPermissions = {
+                canDischargePatients: {{ check_permission('discharge_patient')|tojson }},
+                canViewRecords: {{ check_permission('view_medical_records')|tojson }}
+            };
+        });
+        
+        // Function to load all patients
+        function loadPatients() {
+            fetch('/search-patients')
+                .then(response => response.json())
+                .then(data => {
+                    displayPatients(data);
+                })
+                .catch(error => {
+                    console.error('Error loading patients:', error);
+                });
+        }
+        
+        // Function to search patients
+        function searchPatients() {
+            const searchTerm = document.querySelector('#search-input').value;
+        
+            fetch(`/search-patients?query=${encodeURIComponent(searchTerm)}`)
+                .then(response => response.json())
+                .then(data => {
+                    displayPatients(data);
+                })
+                .catch(error => {
+                    console.error('Error searching patients:', error);
+                });
+        }
+        
+        // Function to display patients in the grid
+        function displayPatients(patients) {
+            const patientsGrid = document.querySelector('#patients-grid');
+            patientsGrid.innerHTML = '';
+        
+            if (patients.length === 0) {
+                patientsGrid.innerHTML = '<div class="no-patients">No patients found</div>';
+                return;
+            }
+        
+            patients.forEach(patient => {
+                const patientCard = document.createElement('div');
+                patientCard.className = 'patient-card';
+                patientCard.setAttribute('data-patient-id', patient.patient_id);
+        
+                patientCard.innerHTML = `
+                    <div class="patient-header">
+                        <span class="patient-title">${patient.patient_name}</span>
+                        <span class="patient-info">${patient.gender}, ${patient.dob}</span>
+                    </div>
+                    <div class="patient-content">
+                        <p>Contact: ${patient.contact || 'Not provided'}</p>
+                        <p>Emergency: ${patient.emergency_contact || 'Not provided'}</p>
+                    </div>
+                `;
+        
+                patientCard.addEventListener('click', function () {
+                    const patientId = this.getAttribute('data-patient-id');
+                    showDetailView(patientId);
+                });
+        
+                patientsGrid.appendChild(patientCard);
+            });
+        }
+        
+        // Function to show detail view for a specific patient
+        function showDetailView(patientId) {
+            fetch(`/get-patient/${patientId}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Populate the form fields
+                    document.querySelector('#patient-id').value = data.patient_id;
+                    document.querySelector('#first-name').value = data.first_name;
+                    document.querySelector('#last-name').value = data.last_name;
+                    document.querySelector('#gender').value = data.gender;
+                    document.querySelector('#dob').value = data.dob;
+                    document.querySelector('#contact').value = data.contact || '';
+                    document.querySelector('#emergency-contact').value = data.emergency_contact || '';
+                    document.querySelector('#address').value = data.address || '';
+        
+                    // Show the detail view
+                    document.querySelector('.list-view').classList.add('hidden');
+                    document.querySelector('.detail-view').classList.add('active');
+                    document.querySelector('.back-button').style.display = 'flex';
+        
+                    // Clear any previous status messages
+                    const statusMessage = document.querySelector('#status-message');
+                    statusMessage.textContent = '';
+                    statusMessage.className = 'status-message';
+                })
+                .catch(error => {
+                    console.error('Error loading patient details:', error);
+                });
+        }
+        
+        // Function to show the list view
+        function showListView() {
+            document.querySelector('.list-view').classList.remove('hidden');
+            document.querySelector('.detail-view').classList.remove('active');
+            document.querySelector('.back-button').style.display = 'none';
+        }
+        
+        // Function to update a patient
+        function updatePatient() {
+            const patientId = document.querySelector('#patient-id').value;
+        
+            const data = {
+                first_name: document.querySelector('#first-name').value,
+                last_name: document.querySelector('#last-name').value,
+                gender: document.querySelector('#gender').value,
+                dob: document.querySelector('#dob').value,
+                contact: document.querySelector('#contact').value,
+                emergency_contact: document.querySelector('#emergency-contact').value,
+                address: document.querySelector('#address').value
+            };
+        
+            fetch(`/update-patient/${patientId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    const statusMessage = document.querySelector('#status-message');
+        
+                    if (data.success) {
+                        statusMessage.textContent = data.message;
+                        statusMessage.className = 'status-message success';
+        
+                        // Refresh patients in the background
+                        loadPatients();
+                    } else {
+                        statusMessage.textContent = data.error;
+                        statusMessage.className = 'status-message error';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error updating patient:', error);
+                    const statusMessage = document.querySelector('#status-message');
+                    statusMessage.textContent = 'An error occurred while updating the patient.';
+                    statusMessage.className = 'status-message error';
+                });
+        }
+        
+        // Function to delete a patient (for admins only)
+        function deletePatient(patientId) {
+            fetch(`/delete-patient/${patientId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show success message
+                    alert(data.message);
+                    // Return to list view and refresh
+                    showListView();
+                    loadPatients();
+                } else {
+                    // Show error message
+                    alert(data.error || 'An error occurred while deleting the patient.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while deleting the patient.');
+            });
+        }
+        
+        function dischargePatient() {
+            // Check if user has permission
+            if (!window.userPermissions.canDischargePatients) {
+                const statusMessage = document.querySelector('#status-message');
+                statusMessage.textContent = 'You do not have permission to discharge patients.';
+                statusMessage.className = 'status-message error';
+                return;
+            }
+            
+            const patientId = document.querySelector('#patient-id').value;
+            const patientName = `${document.querySelector('#first-name').value} ${document.querySelector('#last-name').value}`;
+        
+            // Confirm before discharging
+            if (!confirm(`Are you sure you want to discharge ${patientName}?`)) {
+                return;
+            }
+        
+            fetch(`/discharge-patient/${patientId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    const statusMessage = document.querySelector('#status-message');
+        
+                    if (data.success) {
+                        statusMessage.textContent = data.message;
+                        statusMessage.className = 'status-message success';
+        
+                        // Refresh patients in the background and return to list view after a delay
+                        loadPatients();
+                        setTimeout(showListView, 2000);
+                    } else {
+                        statusMessage.textContent = data.error || 'Error discharging patient.';
+                        statusMessage.className = 'status-message error';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error discharging patient:', error);
+                    const statusMessage = document.querySelector('#status-message');
+                    statusMessage.textContent = 'An error occurred while discharging the patient.';
+                    statusMessage.className = 'status-message error';
+                });
+        }
+        
+        function viewMedicalRecords() {
+            const patientId = document.querySelector('#patient-id').value;
+            window.location.href = `/medical-records?patient=${patientId}`;
+        }
+    </script>
    </body>
 </html>

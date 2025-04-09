@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, render_template, redirect, url_for, flash
+from flask import Blueprint, request, render_template, redirect, url_for, flash, send_from_directory
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import check_password_hash
 from models import User
@@ -40,8 +40,7 @@ def logout():
     flash("You have been logged out.", "success")
     return redirect(url_for("auth.login_page"))
 
-
-@auth_bp.route("/debug_users")
-def debug_users():
-    users = User.query.all()
-    return jsonify([{"username": u.username, "password": u.password} for u in users])
+@auth_bp.route('/logo')
+def serve_logo():
+    # This is a hack - not recommended for production
+    return send_from_directory('templates', 'CIIT-College-logo-negative.png')

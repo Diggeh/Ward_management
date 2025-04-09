@@ -101,9 +101,16 @@
       background-color: #4CAF50;
     }
 
-    .logo {
-      width: 200px;
+    .logo-container {
+      text-align: center;
       margin-top: 20px;
+    }
+    
+    .logo-image {
+      max-width: 100px; /* Smaller size */
+      height: auto;
+      margin: 0 auto;
+      display: block;
     }
 
     @keyframes fadeInForm {
@@ -152,7 +159,9 @@
       <input type="password" name="password" placeholder="Password" required>
       <button type="submit">Login</button>
 
-      <img src="CIIT-College-logo-negative.png" alt="CIIT Logo" class="logo">
+      <div class="logo-container"> 
+        <img src="{{ url_for('auth.serve_logo') }}" alt="CIIT College Logo" class="logo-image">
+      </div>
     </form>
   </div>
 </body>

@@ -367,7 +367,58 @@ def update_patient(patient_id):
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
 
-
+@main_bp.route('/delete-patient/<int:patient_id>', methods=['POST'])
+@login_required
+def delete_patient(patient_id):
+    
+    if not current_user.role_id or current_user.role_id != 1:
+        return jsonify({'error': 'Unauthorized access. Only administrators can delete patients.'}), 403
+    
+    try:
+        
+        patient = Patient.query.get(patient_id)
+        
+        if not patient:
+            return jsonify({'error': 'Patient not found'}), 404
+        
+        patient_name = f"{patient.FirstName} {patient.LastName}"
+        
+        active_admission = Admission.query.filter_by(
+            PatientID=patient_id, 
+            DischargeDate=None
+        ).first()
+        
+        if active_admission:
+            return jsonify({
+                'error': 'Cannot delete patient with active admission. Please discharge the patient first.'
+            }), 400
+        
+        admissions = Admission.query.filter_by(PatientID=patient_id).all()
+        medical_records = MedicalRecord.query.filter_by(PatientID=patient_id).all()
+           
+        for record in medical_records:
+            db.session.delete(record)
+        
+        for admission in admissions:
+            db.session.delete(admission)
+        
+        db.session.delete(patient)
+        db.session.commit()
+        
+        audit_logger.log_audit('patient', patient_id, 'delete', {
+            'patient_name': patient_name,
+            'details': f"Patient and all related records deleted by administrator {current_user.username}"
+        })
+        
+        return jsonify({
+            'success': True,
+            'message': f'Patient {patient_name} has been deleted successfully.'
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+    
 @main_bp.route("/discharge-patient/<int:patient_id>", methods=["POST"])
 @login_required
 @permission_required("discharge_patient")
