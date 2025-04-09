@@ -41,6 +41,7 @@ Audit Logs
 
 **SECURITY**
 Supports password hashing, check constraints for CRUD operations, role-based permissions, and audit logs.
+
 **ROLE-BASED ACCESS**
 Admin - has access to every feature
 Doctor - view, admit, discharge, update patient and medical records 
