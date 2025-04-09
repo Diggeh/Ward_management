@@ -12,7 +12,7 @@ Run by python app.py then access the link given in console\
 logins: (user | pass)\
 admin1 | adminpass\
 doctor1 | doctorpass\
-nurse1 | nursepass\
+nurse1 | nursepass
 
 ## **ARCHITECTURE**
 ### **FRONT END**
