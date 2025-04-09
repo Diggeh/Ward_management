@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management - Ward Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            background: #f5f5f5;
+        }
+
+        .sidebar {
+            width: 260px;
+            background: #003344;
+            color: white;
+            padding: 24px;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+
+        .user-info img {
+            width: 32px;
+            height: 32px;
+        }
+
+        .nav-links {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px;
+            text-decoration: none;
+            color: white;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .nav-link:hover {
+            background: #004455;
+        }
+
+        .nav-link.active {
+            background: #004455;
+        }
+
+        .nav-link img {
+            width: 20px;
+            height: 20px;
+        }
+
+        .logout {
+            position: absolute;
+            bottom: 24px;
+            left: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px;
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .logout:hover {
+            background: #004455;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: #003344;
+            color: white;
+            padding: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            padding-right: 160px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .back-button {
+            position: absolute;
+            right: 24px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+            margin: 0;
+        }
+
+        .back-button img {
+            width: 16px;
+            height: 16px;
+        }
+
+        .back-button:hover {
+            background: #004455;
+        }
+
+        .search-section {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .search-container {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 50px;
+            background: #003344;
+            color: white;
+            font-size: 16px;
+        }
+
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .search-input:focus {
+            outline: 2px solid #0099cc;
+        }
+
+        .enter-button {
+            padding: 12px 32px;
+            background: #00cc99;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+
+        .enter-button:hover {
+            background: #00aa88;
+        }
+
+        .admin-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 16px;
+        }
+
+        .add-user-button {
+            padding: 8px 16px;
+            background: #00cc99;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .add-user-button:hover {
+            background: #00aa88;
+        }
+
+        .users-container {
+            margin: 0 24px;
+            flex: 1;
+            background: #003344;
+            border-radius: 12px;
+            padding: 24px;
+            color: white;
+        }
+
+        .users-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .user-card {
+            background: #004455;
+            border-radius: 8px;
+            padding: 16px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .user-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .user-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .user-title {
+            font-weight: 600;
+        }
+
+        .user-role {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        /* Detail View Styles */
+        .detail-view {
+            display: none;
+            padding: 24px;
+        }
+
+        .detail-view.active {
+            display: block;
+        }
+
+        .list-view {
+            display: block;
+        }
+
+        .list-view.hidden {
+            display: none;
+        }
+
+        .detail-form {
+            background: #003344;
+            border-radius: 12px;
+            padding: 24px;
+            color: white;
+            position: relative;
+            padding-bottom: 80px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .form-grid::after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 12px;
+            background: #004455;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            font-size: 14px;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: 2px solid #0099cc;
+        }
+
+        /* Button Group Styling */
+        .button-group {
+            position: absolute;
+            bottom: 24px;
+            right: 24px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .update-button {
+            position: static;
+            padding: 12px 24px;
+            background: #00cc99;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+
+        .update-button:hover {
+            background: #00aa88;
+        }
+
+        .delete-button {
+            padding: 12px 24px;
+            background: #ff5555;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+
+        .delete-button:hover {
+            background: #ff3333;
+        }
+
+        .status-message {
+            position: absolute;
+            bottom: 80px;
+            left: 24px;
+            right: 24px;
+            padding: 12px;
+            border-radius: 4px;
+            text-align: center;
+            display: none;
+            margin-top: 0;
+        }
+
+        .status-message.success {
+            background: rgba(0, 204, 153, 0.2);
+            color: #00cc99;
+            display: block;
+        }
+
+        .status-message.error {
+            background: rgba(255, 0, 0, 0.2);
+            color: #ff5555;
+            display: block;
+        }
+
+        .no-users {
+            text-align: center;
+            padding: 24px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .password-note {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 4px;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 80px;
+                padding: 16px;
+            }
+
+            .nav-link span,
+            .user-info span,
+            .logout span {
+                display: none;
+            }
+
+            .header {
+                padding-right: 24px;
+            }
+
+            .back-button {
+                position: static;
+                transform: none;
+                margin-top: 16px;
+                width: 100%;
+                justify-content: center;
+            }
+
+            .search-container {
+                flex-direction: column;
+            }
+
+            .search-input {
+                border-radius: 4px;
+            }
+
+            .users-container {
+                margin: 16px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                position: static;
+                flex-direction: column;
+                width: 100%;
+                margin-top: 20px;
+            }
+
+            .update-button,
+            .delete-button {
+                width: 100%;
+            }
+
+            .status-message {
+                position: static;
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <input type="hidden" id="current-user-id" value="{{ user.id }}">
+    <div class="sidebar">
+        <div class="user-info">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2'/%3E%3Ccircle cx='12' cy='7' r='4'/%3E%3C/svg%3E"
+                alt="User">
+            <span>{{ user.username }}</span>
+        </div>
+
+        <nav class="nav-links">
+            <a href="{{ url_for('main.dashboard') }}" class="nav-link">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='3' width='7' height='7'/%3E%3Crect x='14' y='3' width='7' height='7'/%3E%3Crect x='14' y='14' width='7' height='7'/%3E%3Crect x='3' y='14' width='7' height='7'/%3E%3C/svg%3E"
+                    alt="Dashboard">
+                <span>Dashboard</span>
+            </a>
+            <a href="{{ url_for('main.wards') }}" class="nav-link">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'/%3E%3Cpolyline points='9 22 9 12 15 12 15 22'/%3E%3C/svg%3E"
+                    alt="Wards">
+                <span>Wards</span>
+            </a>
+            <a href="{{ url_for('main.patients') }}" class="nav-link">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2'/%3E%3Ccircle cx='9' cy='7' r='4'/%3E%3Cpath d='M23 21v-2a4 4 0 0 0-3-3.87'/%3E%3Cpath d='M16 3.13a4 4 0 0 1 0 7.75'/%3E%3C/svg%3E"
+                    alt="Patients">
+                <span>Patients</span>
+            </a>
+            <a href="{{ url_for('main.admission') }}" class="nav-link">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2'/%3E%3Ccircle cx='8.5' cy='7' r='4'/%3E%3Cline x1='20' y1='8' x2='20' y2='14'/%3E%3Cline x1='23' y1='11' x2='17' y2='11'/%3E%3C/svg%3E"
+                    alt="Admission">
+                <span>Admission</span>
+            </a>
+            <a href="{{ url_for('main.medical_records') }}" class="nav-link">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z'/%3E%3Cpolyline points='14 2 14 8 20 8'/%3E%3Cline x1='16' y1='13' x2='8' y2='13'/%3E%3Cline x1='16' y1='17' x2='8' y2='17'/%3E%3Cpolyline points='10 9 9 9 8 9'/%3E%3C/svg%3E"
+                    alt="Medical Records">
+                <span>Medical Records</span>
+            </a>
+            <a href="{{ url_for('main.admin_page') }}" class="nav-link">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3Cpath d='M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z'/%3E%3C/svg%3E"
+                    alt="Admin">
+                <span>Admin</span>
+            </a>
+        </nav>
+
+        <form action="{{ url_for('auth.logout') }}" method="POST" style="display: inline;">
+            <button type="submit" class="logout">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4'/%3E%3Cpolyline points='16 17 21 12 16 7'/%3E%3Cline x1='21' y1='12' x2='9' y2='12'/%3E%3C/svg%3E"
+                    alt="Logout">
+                <span>Log Out</span>
+            </button>
+        </form>
+    </div>
+
+    <div class="main-content">
+        <header class="header">
+            <h1>USER MANAGEMENT</h1>
+            <button class="back-button" style="display: none;">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cline x1='19' y1='12' x2='5' y2='12'/%3E%3Cpolyline points='12 19 5 12 12 5'/%3E%3C/svg%3E"
+                    alt="Back">
+                Back to Users
+            </button>
+        </header>
+
+        <!-- List View -->
+        <div class="list-view">
+            <div class="search-section">
+                <div class="search-container">
+                    <input type="text" id="search-input" class="search-input" placeholder="Search for username...">
+                </div>
+                <button id="search-button" class="enter-button">SEARCH</button>
+
+                <div class="admin-controls">
+                    <button id="add-user-button" class="add-user-button">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cline x1='12' y1='5' x2='12' y2='19'/%3E%3Cline x1='5' y1='12' x2='19' y2='12'/%3E%3C/svg%3E"
+                            width="16" height="16" alt="Add">
+                        Add New User
+                    </button>
+                </div>
+            </div>
+
+            <div class="users-container">
+                <div id="users-grid" class="users-grid">
+                    <!-- Users will be loaded here dynamically -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Detail View -->
+        <div class="detail-view">
+            <div class="detail-form">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="username">Username:</label>
+                        <input type="text" id="username">
+                        <input type="hidden" id="user-id">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="role">Role:</label>
+                        <select id="role">
+                            <!-- Roles will be loaded dynamically -->
+                        </select>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="password">Password:</label>
+                        <input type="password" id="password">
+                        <p class="password-note" id="password-note">Leave blank to keep current password.</p>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button id="update-button" class="update-button">UPDATE</button>
+                    <button id="delete-button" class="delete-button" style="display: none;">DELETE</button>
+                </div>
+                <div id="status-message" class="status-message"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load all users when the page loads
+        document.addEventListener('DOMContentLoaded', function () {
+            loadUsers();
+            loadRoles();
+
+            // Add event listeners
+            document.querySelector('#search-button').addEventListener('click', searchUsers);
+            document.querySelector('#search-input').addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    searchUsers();
+                }
+            });
+
+            document.querySelector('.back-button').addEventListener('click', showListView);
+            document.querySelector('#update-button').addEventListener('click', updateUser);
+            document.querySelector('#add-user-button').addEventListener('click', showAddUserForm);
+            document.querySelector('#delete-button').addEventListener('click', deleteUser);
+        });
+
+        // Function to load all users
+        function loadUsers() {
+            fetch('/search-users')
+                .then(response => response.json())
+                .then(data => {
+                    displayUsers(data);
+                })
+                .catch(error => {
+                    console.error('Error loading users:', error);
+                });
+        }
+
+        // Function to load all roles
+        function loadRoles() {
+            fetch('/get-roles')
+                .then(response => response.json())
+                .then(data => {
+                    const roleSelect = document.querySelector('#role');
+                    roleSelect.innerHTML = '';
+
+                    data.forEach(role => {
+                        const option = document.createElement('option');
+                        option.value = role.role_id;
+                        option.textContent = role.role_name;
+                        roleSelect.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading roles:', error);
+                });
+        }
+
+        // Function to search users
+        function searchUsers() {
+            const searchTerm = document.querySelector('#search-input').value;
+
+            fetch(`/search-users?query=${encodeURIComponent(searchTerm)}`)
+                .then(response => response.json())
+                .then(data => {
+                    displayUsers(data);
+                })
+                .catch(error => {
+                    console.error('Error searching users:', error);
+                });
+        }
+
+        // Function to display users in the grid
+        function displayUsers(users) {
+            const usersGrid = document.querySelector('#users-grid');
+            usersGrid.innerHTML = '';
+
+            if (users.length === 0) {
+                usersGrid.innerHTML = '<div class="no-users">No users found</div>';
+                return;
+            }
+
+            users.forEach(user => {
+                const userCard = document.createElement('div');
+                userCard.className = 'user-card';
+                userCard.setAttribute('data-user-id', user.user_id);
+
+                userCard.innerHTML = `
+                    <div class="user-header">
+                        <span class="user-title">${user.username}</span>
+                        <span class="user-role">${user.role_name}</span>
+                    </div>
+                `;
+
+                userCard.addEventListener('click', function () {
+                    const userId = this.getAttribute('data-user-id');
+                    showDetailView(userId);
+                });
+
+                usersGrid.appendChild(userCard);
+            });
+        }
+
+        // Function to show detail view for a specific user
+        function showDetailView(userId) {
+            fetch(`/get-user/${userId}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Populate the form fields
+                    document.querySelector('#user-id').value = data.user_id;
+                    document.querySelector('#username').value = data.username;
+                    document.querySelector('#role').value = data.role_id;
+                    document.querySelector('#password').value = '';
+
+                    // Show password note for existing users
+                    document.querySelector('#password-note').style.display = 'block';
+
+                    // Show the detail view
+                    document.querySelector('.list-view').classList.add('hidden');
+                    document.querySelector('.detail-view').classList.add('active');
+                    document.querySelector('.back-button').style.display = 'flex';
+
+                    // Update button text
+                    document.querySelector('#update-button').textContent = 'UPDATE';
+
+                    // Get current user ID from the hidden input field
+                    const currentUserId = parseInt(document.getElementById('current-user-id').value);
+
+                    // Show delete button for existing users (but not for current user)
+                    if (parseInt(data.user_id) !== currentUserId) {
+                        document.querySelector('#delete-button').style.display = 'block';
+                    } else {
+                        document.querySelector('#delete-button').style.display = 'none';
+                    }
+
+                    // Clear any previous status messages
+                    const statusMessage = document.querySelector('#status-message');
+                    statusMessage.textContent = '';
+                    statusMessage.className = 'status-message';
+                })
+                .catch(error => {
+                    console.error('Error loading user details:', error);
+                });
+        }
+
+        // Function to show form for adding a new user
+        function showAddUserForm() {
+            // Clear the form
+            document.querySelector('#user-id').value = '';
+            document.querySelector('#username').value = '';
+            document.querySelector('#password').value = '';
+
+            // Set default role if available
+            const roleSelect = document.querySelector('#role');
+            if (roleSelect.options.length > 0) {
+                roleSelect.selectedIndex = 0;
+            }
+
+            // Hide password note for new users
+            document.querySelector('#password-note').style.display = 'none';
+
+            // Hide delete button for new users
+            document.querySelector('#delete-button').style.display = 'none';
+
+            // Show the detail view
+            document.querySelector('.list-view').classList.add('hidden');
+            document.querySelector('.detail-view').classList.add('active');
+            document.querySelector('.back-button').style.display = 'flex';
+
+            // Update button text
+            document.querySelector('#update-button').textContent = 'CREATE';
+
+            // Clear any previous status messages
+            const statusMessage = document.querySelector('#status-message');
+            statusMessage.textContent = '';
+            statusMessage.className = 'status-message';
+        }
+
+        // Function to show the list view
+        function showListView() {
+            document.querySelector('.list-view').classList.remove('hidden');
+            document.querySelector('.detail-view').classList.remove('active');
+            document.querySelector('.back-button').style.display = 'none';
+
+            // Refresh the user list
+            loadUsers();
+        }
+
+        // Function to update or create a user
+        function updateUser() {
+            const userId = document.querySelector('#user-id').value;
+            const username = document.querySelector('#username').value;
+            const roleId = document.querySelector('#role').value;
+            const password = document.querySelector('#password').value;
+
+            if (!username) {
+                const statusMessage = document.querySelector('#status-message');
+                statusMessage.textContent = 'Username is required';
+                statusMessage.className = 'status-message error';
+                return;
+            }
+
+            // For new users, password is required
+            if (!userId && !password) {
+                const statusMessage = document.querySelector('#status-message');
+                statusMessage.textContent = 'Password is required for new users';
+                statusMessage.className = 'status-message error';
+                return;
+            }
+
+            const data = {
+                username: username,
+                role_id: parseInt(roleId),
+                password: password
+            };
+
+            let url, method;
+
+            if (userId) {
+                // Update existing user
+                url = `/update-user/${userId}`;
+                method = 'POST';
+            } else {
+                // Create new user
+                url = '/create-user';
+                method = 'POST';
+            }
+
+            fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    const statusMessage = document.querySelector('#status-message');
+
+                    if (data.success) {
+                        statusMessage.textContent = data.message;
+                        statusMessage.className = 'status-message success';
+
+                        // If creating a user, update form to edit mode
+                        if (!userId && data.user_id) {
+                            document.querySelector('#user-id').value = data.user_id;
+                            document.querySelector('#password').value = '';
+                            document.querySelector('#password-note').style.display = 'block';
+                            document.querySelector('#update-button').textContent = 'UPDATE';
+
+                            // Show delete button since this is now an existing user
+                            document.querySelector('#delete-button').style.display = 'block';
+                        }
+
+                        // Refresh the user list in the background
+                        loadUsers();
+                    } else {
+                        statusMessage.textContent = data.error;
+                        statusMessage.className = 'status-message error';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error updating user:', error);
+                    const statusMessage = document.querySelector('#status-message');
+                    statusMessage.textContent = 'An error occurred while updating the user.';
+                    statusMessage.className = 'status-message error';
+                });
+        }
+
+        // Function to delete a user
+        function deleteUser() {
+            const userId = document.querySelector('#user-id').value;
+            const username = document.querySelector('#username').value;
+
+            if (!userId) {
+                return;
+            }
+
+            if (!confirm(`Are you sure you want to delete the user "${username}"? This action cannot be undone.`)) {
+                return;
+            }
+
+            fetch(`/delete-user/${userId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Return to list view and refresh
+                        showListView();
+                    } else {
+                        const statusMessage = document.querySelector('#status-message');
+                        statusMessage.textContent = data.error;
+                        statusMessage.className = 'status-message error';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error deleting user:', error);
+                    const statusMessage = document.querySelector('#status-message');
+                    statusMessage.textContent = 'An error occurred while deleting the user.';
+                    statusMessage.className = 'status-message error';
+                });
+        }
+    </script>
+</body>
+
+</html>

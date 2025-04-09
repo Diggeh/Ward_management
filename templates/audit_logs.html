@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audit Logs - Ward Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            background: #f5f5f5;
+        }
+
+        .sidebar {
+            width: 260px;
+            background: #003344;
+            color: white;
+            padding: 24px;
+            position: fixed;
+            min-height: 100vh;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+
+        /* Add sidebar collapsed/active states */
+        .sidebar-collapsed {
+            transform: translateX(-220px);
+        }
+        .sidebar-active {
+             transform: translateX(0);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+
+        .user-info img {
+            width: 32px;
+            height: 32px;
+        }
+
+        .nav-links {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px;
+            text-decoration: none;
+            color: white;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .nav-link:hover {
+            background: #004455;
+        }
+
+        .nav-link.active {
+            background: #004455;
+        }
+
+        .nav-link img {
+            width: 20px;
+            height: 20px;
+        }
+
+        .logout {
+            position: absolute;
+            bottom: 24px;
+            left: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px;
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .logout:hover {
+            background: #004455;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            transition: margin-left 0.3s ease;
+        }
+        
+        .main-content-expanded {
+            margin-left: 40px;
+        }
+
+        .header {
+            background: #003344;
+            color: white;
+            padding: 24px;
+            position: sticky;
+            top: 0;
+            z-index: 999;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .burger-menu {
+            font-size: 24px;
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            display: none;
+        }
+
+        .filter-bar {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: flex-end;
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 180px;
+        }
+
+        .filter-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .filter-group select,
+        .filter-group input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .filter-btn {
+            background: #003344;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 9px 20px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+
+        .filter-btn:hover {
+            background: #004455;
+        }
+
+        .logs-container {
+            margin: 20px;
+        }
+
+        .log-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .log-table th,
+        .log-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .log-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .log-table tbody tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .log-table .operation-insert {
+            color: green;
+            font-weight: 500;
+        }
+
+        .log-table .operation-update {
+            color: orange;
+            font-weight: 500;
+        }
+
+        .log-table .operation-delete {
+            color: red;
+            font-weight: 500;
+        }
+
+        .log-details {
+            display: none;
+            padding: 0 15px 15px;
+            background: #f9f9f9;
+            border-bottom: 1px solid #eee;
+        }
+
+        .log-details h4 {
+            margin: 10px 0;
+            color: #333;
+        }
+
+        .changes-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 5px;
+        }
+
+        .changes-table th,
+        .changes-table td {
+            padding: 8px 10px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        .changes-table th {
+            background: #f1f1f1;
+            font-weight: 500;
+        }
+
+        .expand-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #003344;
+            font-size: 20px;
+        }
+
+        .no-logs {
+            text-align: center;
+            padding: 30px;
+            color: #666;
+            font-size: 16px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 30px;
+            color: #666;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            gap: 5px;
+        }
+
+        .pagination button {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            background: white;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .pagination button.active {
+            background: #003344;
+            color: white;
+            border-color: #003344;
+        }
+
+        .pagination button:hover:not(.active) {
+            background: #f5f5f5;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-220px);
+                z-index: 1001;
+            }
+            .sidebar-active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+            .main-content-expanded {
+                margin-left: 0;
+            }
+
+            .burger-menu {
+                display: block;
+            }
+
+            .filter-group {
+                min-width: 100%;
+            }
+
+            .log-table {
+                font-size: 14px;
+            }
+
+            .log-table th:nth-child(3),
+            .log-table td:nth-child(3) {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar" id="sidebar">
+        <div class="user-info">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2'/%3E%3Ccircle cx='12' cy='7' r='4'/%3E%3C/svg%3E" alt="User">
+            <span>{{ user.username }}</span>
+        </div>
+        
+        <nav class="nav-links">
+            <a href="{{ url_for('main.dashboard') }}" class="nav-link {% if request.endpoint == 'main.dashboard' %}active{% endif %}">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='3' width='7' height='7'/%3E%3Crect x='14' y='3' width='7' height='7'/%3E%3Crect x='14' y='14' width='7' height='7'/%3E%3Crect x='3' y='14' width='7' height='7'/%3E%3C/svg%3E" alt="Dashboard">
+                <span>Dashboard</span>
+            </a>
+            <a href="{{ url_for('main.wards') }}" class="nav-link {% if request.endpoint == 'main.wards' %}active{% endif %}">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'/%3E%3Cpolyline points='9 22 9 12 15 12 15 22'/%3E%3C/svg%3E" alt="Wards">
+                <span>Wards</span>
+            </a>
+            <a href="{{ url_for('main.patients') }}" class="nav-link {% if request.endpoint == 'main.patients' %}active{% endif %}">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2'/%3E%3Ccircle cx='9' cy='7' r='4'/%3E%3Cpath d='M23 21v-2a4 4 0 0 0-3-3.87'/%3E%3Cpath d='M16 3.13a4 4 0 0 1 0 7.75'/%3E%3C/svg%3E" alt="Patients">
+                <span>Patients</span>
+            </a>
+            <a href="{{ url_for('main.admission') }}" class="nav-link {% if request.endpoint == 'main.admission' %}active{% endif %}">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2'/%3E%3Ccircle cx='8.5' cy='7' r='4'/%3E%3Cline x1='20' y1='8' x2='20' y2='14'/%3E%3Cline x1='23' y1='11' x2='17' y2='11'/%3E%3C/svg%3E" alt="Admission">
+                <span>Admission</span>
+            </a>
+            <a href="{{ url_for('main.medical_records') }}" class="nav-link {% if request.endpoint == 'main.medical_records' %}active{% endif %}">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z'/%3E%3Cpolyline points='14 2 14 8 20 8'/%3E%3Cline x1='16' y1='13' x2='8' y2='13'/%3E%3Cline x1='16' y1='17' x2='8' y2='17'/%3E%3Cpolyline points='10 9 9 9 8 9'/%3E%3C/svg%3E" alt="Medical Records">
+                <span>Medical Records</span>
+            </a>
+            <a href="{{ url_for('main.admin_page') }}" class="nav-link {% if request.endpoint == 'main.admin_page' %}active{% endif %}">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3Cpath d='M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z'/%3E%3C/svg%3E" alt="Admin">
+                <span>Admin</span>
+            </a>
+        </nav>
+
+        <form action="{{ url_for('auth.logout') }}" method="POST" style="display: inline;">
+            <button type="submit" class="logout">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4'/%3E%3Cpolyline points='16 17 21 12 16 7'/%3E%3Cline x1='21' y1='12' x2='9' y2='12'/%3E%3C/svg%3E" alt="Logout">
+                <span>Log Out</span>
+            </button>
+        </form>
+    </div>
+
+    <div class="main-content" id="main-content">
+        <header class="header">
+            <button class="burger-menu" id="menu-toggle">☰</button>
+            <h1>AUDIT LOGS</h1>
+            <div style="width: 40px;"></div>
+        </header>
+
+        <div class="filter-bar">
+            <div class="filter-group">
+                <label for="entity-type">Entity Type</label>
+                <select id="entity-type">
+                    <option value="">All Entities</option>
+                    <option value="patient">Patients</option>
+                    <option value="admission">Admissions</option>
+                    <option value="medical_record">Medical Records</option>
+                    <option value="ward">Wards</option>
+                    <option value="bed">Beds</option>
+                    <option value="user">Users</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="date-from">From Date</label>
+                <input type="date" id="date-from">
+            </div>
+            <div class="filter-group">
+                <label for="date-to">To Date</label>
+                <input type="date" id="date-to">
+            </div>
+            <div class="filter-group">
+                <label for="user-filter">User</label>
+                <select id="user-filter">
+                    <option value="">All Users</option>
+                    <!-- Users will be populated by JavaScript -->
+                </select>
+            </div>
+            <button id="apply-filters" class="filter-btn">Apply Filters</button>
+        </div>
+
+        <div class="logs-container">
+            <div id="loading" class="loading">Loading audit logs...</div>
+            <table id="log-table" class="log-table" style="display: none;">
+                <thead>
+                    <tr>
+                        <th style="width: 5%"></th>
+                        <th style="width: 15%">Timestamp</th>
+                        <th style="width: 15%">User</th>
+                        <th style="width: 15%">Entity Type</th>
+                        <th style="width: 25%">Entity Name</th>
+                        <th style="width: 10%">Operation</th>
+                    </tr>
+                </thead>
+                <tbody id="logs-body">
+                    <!-- Logs will be populated by JavaScript -->
+                </tbody>
+            </table>
+            <div id="no-logs" class="no-logs" style="display: none;">No audit logs found for the selected filters.</div>
+        </div>
+    </div>
+
+    <script>
+        // Sidebar Toggle Script
+        document.getElementById("menu-toggle").addEventListener("click", function() {
+            document.getElementById("sidebar").classList.toggle("sidebar-active");
+            
+            // Adjust main content margin based on sidebar state
+            if (document.getElementById("sidebar").classList.contains("sidebar-active")) {
+                document.getElementById("main-content").classList.remove("main-content-expanded");
+            } else {
+                document.getElementById("main-content").classList.add("main-content-expanded");
+            }
+        });
+        
+        // Initialize sidebar state based on screen size
+        function checkScreenSize() {
+            if (window.innerWidth <= 768) {
+                document.getElementById("sidebar").classList.remove("sidebar-active");
+                document.getElementById("main-content").classList.add("main-content-expanded");
+            } else {
+                document.getElementById("sidebar").classList.add("sidebar-active");
+                document.getElementById("main-content").classList.remove("main-content-expanded");
+            }
+        }
+        
+        // Check on load and resize
+        window.addEventListener('load', checkScreenSize);
+        window.addEventListener('resize', checkScreenSize);
+
+        // Load users for filter dropdown
+        function loadUsers() {
+            fetch('/get-roles')
+                .then(response => response.json())
+                .then(data => {
+                    // We'll use the same endpoint to get users that we use for the admin users page
+                    return fetch('/search-users');
+                })
+                .then(response => response.json())
+                .then(users => {
+                    const userSelect = document.getElementById('user-filter');
+                    
+                    // Clear existing options except the first one
+                    while (userSelect.options.length > 1) {
+                        userSelect.remove(1);
+                    }
+                    
+                    // Add users to dropdown
+                    users.forEach(user => {
+                        const option = document.createElement('option');
+                        option.value = user.user_id;
+                        option.textContent = user.username;
+                        userSelect.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading users:', error);
+                });
+        }
+
+        // Load audit logs based on filters
+        function loadAuditLogs() {
+            const entityType = document.getElementById('entity-type').value;
+            const dateFrom = document.getElementById('date-from').value;
+            const dateTo = document.getElementById('date-to').value;
+            const userId = document.getElementById('user-filter').value;
+            
+            // Show loading indicator
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('log-table').style.display = 'none';
+            document.getElementById('no-logs').style.display = 'none';
+            
+            // Build query string
+            let queryParams = new URLSearchParams();
+            if (entityType) queryParams.append('entity_type', entityType);
+            if (dateFrom) queryParams.append('date_from', dateFrom);
+            if (dateTo) queryParams.append('date_to', dateTo);
+            if (userId) queryParams.append('user_id', userId);
+            
+            // Fetch logs
+            fetch(`/search-audit-logs?${queryParams.toString()}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Hide loading indicator
+                    document.getElementById('loading').style.display = 'none';
+                    
+                    if (data.error) {
+                        alert(`Error: ${data.error}`);
+                        return;
+                    }
+                    
+                    if (data.length === 0) {
+                        // Show no logs message
+                        document.getElementById('no-logs').style.display = 'block';
+                        return;
+                    }
+                    
+                                        // Show table
+                                        document.getElementById('log-table').style.display = 'table';
+                    
+                    // Populate table
+                    const logsBody = document.getElementById('logs-body');
+                    logsBody.innerHTML = '';
+                    
+                    data.forEach((log, index) => {
+                        // Create main row
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>
+                                <button class="expand-btn" data-index="${index}">+</button>
+                            </td>
+                            <td>${log.timestamp}</td>
+                            <td>${log.user}</td>
+                            <td>${capitalizeFirstLetter(log.entity_type)}</td>
+                            <td>${log.entity_name}</td>
+                            <td class="operation-${log.operation.toLowerCase()}">${capitalizeFirstLetter(log.operation)}</td>
+                        `;
+                        logsBody.appendChild(row);
+                        
+                        // Create details row
+                        const detailsRow = document.createElement('tr');
+                        detailsRow.className = 'log-details';
+                        detailsRow.id = `details-${index}`;
+                        
+                        // Create details content
+                        let detailsContent = `<td colspan="6">`;
+                        
+                        if (log.changes && log.changes.length > 0) {
+                            detailsContent += `
+                                <h4>Changes</h4>
+                                <table class="changes-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Field</th>
+                                            <th>Old Value</th>
+                                            <th>New Value</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                            `;
+                            
+                            log.changes.forEach(change => {
+                                detailsContent += `
+                                    <tr>
+                                        <td>${formatFieldName(change.field)}</td>
+                                        <td>${change.old_value !== null ? change.old_value : '(none)'}</td>
+                                        <td>${change.new_value !== null ? change.new_value : '(none)'}</td>
+                                    </tr>
+                                `;
+                            });
+                            
+                            detailsContent += `
+                                    </tbody>
+                                </table>
+                            `;
+                        } else {
+                            detailsContent += `<p>No detailed change information available.</p>`;
+                        }
+                        
+                        detailsContent += `</td>`;
+                        detailsRow.innerHTML = detailsContent;
+                        logsBody.appendChild(detailsRow);
+                    });
+                    
+                    // Add click handlers for expand/collapse buttons
+                    document.querySelectorAll('.expand-btn').forEach(button => {
+                        button.addEventListener('click', function() {
+                            const index = this.getAttribute('data-index');
+                            const detailsRow = document.getElementById(`details-${index}`);
+                            
+                            if (detailsRow.style.display === 'table-row') {
+                                detailsRow.style.display = 'none';
+                                this.textContent = '+';
+                            } else {
+                                detailsRow.style.display = 'table-row';
+                                this.textContent = '-';
+                            }
+                        });
+                    });
+                })
+                .catch(error => {
+                    document.getElementById('loading').style.display = 'none';
+                    console.error('Error loading audit logs:', error);
+                    alert('An error occurred while loading audit logs. Please try again.');
+                });
+        }
+        
+        // Helper functions
+        function capitalizeFirstLetter(string) {
+            if (!string) return '';
+            return string.charAt(0).toUpperCase() + string.slice(1).replace(/_/g, ' ');
+        }
+        
+        // Update the formatFieldName function to handle the new format
+        function formatFieldName(fieldName) {
+            if (!fieldName) return '';
+            // Convert snake_case or camelCase to Title Case With Spaces
+            return fieldName
+                .replace(/([A-Z])/g, ' $1') // Insert space before capital letters
+                .replace(/_/g, ' ')         // Replace underscores with spaces
+                .replace(/^\w/, c => c.toUpperCase()) // Capitalize first letter
+                .trim();
+        }
+        
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set default date range to last 7 days
+            const today = new Date();
+            const sevenDaysAgo = new Date();
+            sevenDaysAgo.setDate(today.getDate() - 7);
+            
+            document.getElementById('date-to').value = today.toISOString().split('T')[0];
+            document.getElementById('date-from').value = sevenDaysAgo.toISOString().split('T')[0];
+            
+            // Load users for filter
+            loadUsers();
+            
+            // Load initial logs
+            loadAuditLogs();
+            
+            // Set up filter button
+            document.getElementById('apply-filters').addEventListener('click', loadAuditLogs);
+        });
+    </script>
+</body>
+</html>

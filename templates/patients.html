@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Patients - Ward Management System</title>
+      <style>
+         * {
+         margin: 0;
+         padding: 0;
+         box-sizing: border-box;
+         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+         }
+         body {
+         display: flex;
+         min-height: 100vh;
+         background: #f5f5f5;
+         }
+         .sidebar {
+         width: 260px;
+         background: #003344;
+         color: white;
+         padding: 24px;
+         position: relative;
+         min-height: 100vh;
+         }
+         .user-info {
+         display: flex;
+         align-items: center;
+         gap: 12px;
+         margin-bottom: 32px;
+         }
+         .user-info img {
+         width: 32px;
+         height: 32px;
+         }
+         .nav-links {
+         display: flex;
+         flex-direction: column;
+         gap: 16px;
+         }
+         .nav-link {
+         display: flex;
+         align-items: center;
+         gap: 12px;
+         padding: 8px;
+         text-decoration: none;
+         color: white;
+         border-radius: 4px;
+         transition: background-color 0.2s;
+         }
+         .nav-link:hover {
+         background: #004455;
+         }
+         .nav-link.active {
+         background: #004455;
+         }
+         .nav-link img {
+         width: 20px;
+         height: 20px;
+         }
+         .logout {
+         position: absolute;
+         bottom: 24px;
+         left: 24px;
+         display: flex;
+         align-items: center;
+         gap: 12px;
+         padding: 8px;
+         background: none;
+         border: none;
+         color: white;
+         cursor: pointer;
+         border-radius: 4px;
+         transition: background-color 0.2s;
+         }
+         .logout:hover {
+         background: #004455;
+         }
+         .main-content {
+         flex: 1;
+         display: flex;
+         flex-direction: column;
+         }
+         .header {
+         background: #003344;
+         color: white;
+         padding: 24px;
+         display: flex;
+         justify-content: space-between;
+         align-items: center;
+         position: relative;
+         padding-right: 160px;
+         }
+         .header h1 {
+         font-size: 24px;
+         font-weight: 600;
+         }
+         .back-button {
+         position: absolute;
+         right: 24px;
+         top: 50%;
+         transform: translateY(-50%);
+         background: none;
+         border: none;
+         color: white;
+         cursor: pointer;
+         display: flex;
+         align-items: center;
+         gap: 8px;
+         padding: 8px 16px;
+         border-radius: 4px;
+         transition: background-color 0.2s;
+         margin: 0;
+         }
+         .back-button img {
+         width: 16px;
+         height: 16px;
+         }
+         .back-button:hover {
+         background: #004455;
+         }
+         .search-section {
+         padding: 24px;
+         display: flex;
+         flex-direction: column;
+         align-items: center;
+         gap: 16px;
+         }
+         .search-container {
+         width: 100%;
+         max-width: 800px;
+         display: flex;
+         gap: 12px;
+         }
+         .search-input {
+         flex: 1;
+         padding: 12px 20px;
+         border: none;
+         border-radius: 50px;
+         background: #003344;
+         color: white;
+         font-size: 16px;
+         }
+         .search-input::placeholder {
+         color: rgba(255, 255, 255, 0.6);
+         }
+         .search-input:focus {
+         outline: 2px solid #0099cc;
+         }
+         .enter-button {
+         padding: 12px 32px;
+         background: #00cc99;
+         color: white;
+         border: none;
+         border-radius: 4px;
+         cursor: pointer;
+         font-weight: 600;
+         transition: background-color 0.2s;
+         }
+         .enter-button:hover {
+         background: #00aa88;
+         }
+         .patients-container {
+         margin: 0 24px;
+         flex: 1;
+         background: #003344;
+         border-radius: 12px;
+         padding: 24px;
+         color: white;
+         }
+         .patients-grid {
+         display: grid;
+         grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+         gap: 20px;
+         }
+         .patient-card {
+         background: #004455;
+         border-radius: 8px;
+         padding: 16px;
+         cursor: pointer;
+         transition: transform 0.2s;
+         }
+         .patient-card:hover {
+         transform: translateY(-4px);
+         }
+         .patient-header {
+         display: flex;
+         justify-content: space-between;
+         align-items: center;
+         margin-bottom: 12px;
+         }
+         .patient-title {
+         font-weight: 600;
+         }
+         .patient-info {
+         font-size: 14px;
+         opacity: 0.8;
+         }
+         .patient-content {
+         font-size: 14px;
+         line-height: 1.5;
+         }
+         /* Detail View Styles */
+         .detail-view {
+         display: none;
+         padding: 24px;
+         }
+         .detail-view.active {
+         display: block;
+         }
+         .list-view {
+         display: block;
+         }
+         .list-view.hidden {
+         display: none;
+         }
+         .detail-form {
+         background: #003344;
+         border-radius: 12px;
+         padding: 24px;
+         color: white;
+         position: relative;
+         padding-bottom: 80px;
+         }
+         .form-grid {
+         display: grid;
+         grid-template-columns: repeat(2, 1fr);
+         gap: 20px;
+         }
+         .form-grid::after {
+         content: "";
+         display: table;
+         clear: both;
+         }
+         .form-group {
+         display: flex;
+         flex-direction: column;
+         gap: 8px;
+         }
+         .form-group.full-width {
+         grid-column: 1 / -1;
+         }
+         .form-group label {
+         font-size: 14px;
+         font-weight: 500;
+         }
+         .form-group input,
+         .form-group textarea,
+         .form-group select {
+         padding: 12px;
+         background: #004455;
+         border: none;
+         border-radius: 4px;
+         color: white;
+         font-size: 14px;
+         resize: vertical;
+         }
+         .form-group textarea {
+         min-height: 100px;
+         }
+         .form-group input:focus,
+         .form-group textarea:focus,
+         .form-group select:focus {
+         outline: 2px solid #0099cc;
+         }
+         /* Button Group Styling */
+         .button-group {
+         position: absolute;
+         bottom: 24px;
+         right: 24px;
+         display: flex;
+         gap: 12px;
+         }
+         .update-button {
+         position: static;
+         padding: 12px 24px;
+         background: #00cc99;
+         color: white;
+         border: none;
+         border-radius: 4px;
+         cursor: pointer;
+         font-weight: 600;
+         transition: background-color 0.2s;
+         }
+         .update-button:hover {
+         background: #00aa88;
+         }
+         .action-button {
+         padding: 12px 24px;
+         color: white;
+         border: none;
+         border-radius: 4px;
+         cursor: pointer;
+         font-weight: 600;
+         transition: background-color 0.2s;
+         }
+         .discharge-button {
+         background: #ff5555;
+         }
+         .discharge-button:hover {
+         background: #ff3333;
+         }
+         .records-button {
+         background: #0099cc;
+         }
+         .records-button:hover {
+         background: #0077aa;
+         }
+         .delete-button {
+         background: #ff3300;
+         }
+         .delete-button:hover {
+         background: #cc2200;
+         }
+         .status-message {
+         position: absolute;
+         bottom: 80px;
+         left: 24px;
+         right: 24px;
+         padding: 12px;
+         border-radius: 4px;
+         text-align: center;
+         display: none;
+         margin-top: 0;
+         }
+         .status-message.success {
+         background: rgba(0, 204, 153, 0.2);
+         color: #00cc99;
+         display: block;
+         }
+         .status-message.error {
+         background: rgba(255, 0, 0, 0.2);
+         color: #ff5555;
+         display: block;
+         }
+         .no-patients {
+         text-align: center;
+         padding: 24px;
+         color: rgba(255, 255, 255, 0.7);
+         }
+         @media (max-width: 768px) {
+         .sidebar {
+         width: 80px;
+         padding: 16px;
+         }
+         .nav-link span,
+         .user-info span,
+         .logout span {
+         display: none;
+         }
+         .header {
+         padding-right: 24px;
+         }
+         .back-button {
+         position: static;
+         transform: none;
+         margin-top: 16px;
+         width: 100%;
+         justify-content: center;
+         }
+         .search-container {
+         flex-direction: column;
+         }
+         .search-input {
+         border-radius: 4px;
+         }
+         .patients-container {
+         margin: 16px;
+         }
+         .form-grid {
+         grid-template-columns: 1fr;
+         }
+         .button-group {
+         position: static;
+         flex-direction: column;
+         width: 100%;
+         margin-top: 20px;
+         }
+         .update-button,
+         .action-button {
+         width: 100%;
+         }
+         .status-message {
+         position: static;
+         margin-bottom: 20px;
+         }
+         }
+      </style>
+   </head>
+   <body>
+      <div class="sidebar">
+         <div class="user-info">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2'/%3E%3Ccircle cx='12' cy='7' r='4'/%3E%3C/svg%3E"
+               alt="User">
+            <span>{{ user.username }}</span>
+         </div>
+         <nav class="nav-links">
+            <a href="{{ url_for('main.dashboard') }}" class="nav-link">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='3' width='7' height='7'/%3E%3Crect x='14' y='3' width='7' height='7'/%3E%3Crect x='14' y='14' width='7' height='7'/%3E%3Crect x='3' y='14' width='7' height='7'/%3E%3C/svg%3E"
+               alt="Dashboard">
+            <span>Dashboard</span>
+            </a>
+            <a href="{{ url_for('main.wards') }}" class="nav-link">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'/%3E%3Cpolyline points='9 22 9 12 15 12 15 22'/%3E%3C/svg%3E"
+               alt="Wards">
+            <span>Wards</span>
+            </a>
+            <a href="{{ url_for('main.patients') }}" class="nav-link active">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2'/%3E%3Ccircle cx='9' cy='7' r='4'/%3E%3Cpath d='M23 21v-2a4 4 0 0 0-3-3.87'/%3E%3Cpath d='M16 3.13a4 4 0 0 1 0 7.75'/%3E%3C/svg%3E"
+               alt="Patients">
+            <span>Patients</span>
+            </a>
+            <a href="{{ url_for('main.admission') }}" class="nav-link">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2'/%3E%3Ccircle cx='8.5' cy='7' r='4'/%3E%3Cline x1='20' y1='8' x2='20' y2='14'/%3E%3Cline x1='23' y1='11' x2='17' y2='11'/%3E%3C/svg%3E"
+               alt="Admission">
+            <span>Admission</span>
+            </a>
+            <a href="{{ url_for('main.medical_records') }}" class="nav-link">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z'/%3E%3Cpolyline points='14 2 14 8 20 8'/%3E%3Cline x1='16' y1='13' x2='8' y2='13'/%3E%3Cline x1='16' y1='17' x2='8' y2='17'/%3E%3Cpolyline points='10 9 9 9 8 9'/%3E%3C/svg%3E"
+               alt="Medical Records">
+            <span>Medical Records</span>
+            </a>
+            {# Show Admin link only if user is an admin (role_id = 1) #}
+            {% if user.role_id == 1 %}
+            <a href="{{ url_for('main.admin_page') }}"
+               class="nav-link {% if request.endpoint == 'main.admin_page' %}active{% endif %}">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3Cpath d='M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z'/%3E%3C/svg%3E"
+               alt="Admin">
+            <span>Admin</span>
+            </a>
+            {% endif %}
+         </nav>
+         <form action="{{ url_for('auth.logout') }}" method="POST" style="display: inline;">
+            <button type="submit" class="logout">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4'/%3E%3Cpolyline points='16 17 21 12 16 7'/%3E%3Cline x1='21' y1='12' x2='9' y2='12'/%3E%3C/svg%3E"
+               alt="Logout">
+            <span>Log Out</span>
+            </button>
+         </form>
+      </div>
+      <div class="main-content">
+         <header class="header">
+            <h1>PATIENTS</h1>
+            <button class="back-button" style="display: none;">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cline x1='19' y1='12' x2='5' y2='12'/%3E%3Cpolyline points='12 19 5 12 12 5'/%3E%3C/svg%3E"
+               alt="Back">
+            Back to Patients
+            </button>
+         </header>
+         <!-- List View -->
+         <div class="list-view">
+            <div class="search-section">
+               <div class="search-container">
+                  <input type="text" id="search-input" class="search-input" placeholder="Search for patient name...">
+               </div>
+               <button id="search-button" class="enter-button">SEARCH</button>
+            </div>
+            <div class="patients-container">
+               <div id="patients-grid" class="patients-grid">
+                  <!-- Patients will be loaded here dynamically -->
+               </div>
+            </div>
+         </div>
+         <!-- Detail View -->
+         <div class="detail-view">
+            <div class="detail-form">
+               <div class="form-grid">
+                  <div class="form-group">
+                     <label for="first-name">First Name:</label>
+                     <input type="text" id="first-name">
+                     <input type="hidden" id="patient-id">
+                  </div>
+                  <div class="form-group">
+                     <label for="last-name">Last Name:</label>
+                     <input type="text" id="last-name">
+                  </div>
+                  <div class="form-group">
+                     <label for="gender">Gender:</label>
+                     <select id="gender">
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                     </select>
+                  </div>
+                  <div class="form-group">
+                     <label for="dob">Date of Birth:</label>
+                     <input type="date" id="dob">
+                  </div>
+                  <div class="form-group">
+                     <label for="contact">Contact Number:</label>
+                     <input type="text" id="contact">
+                  </div>
+                  <div class="form-group">
+                     <label for="emergency-contact">Emergency Contact:</label>
+                     <input type="text" id="emergency-contact">
+                  </div>
+                  <div class="form-group full-width">
+                     <label for="address">Address:</label>
+                     <textarea id="address"></textarea>
+                  </div>
+                  <div class="button-group">
+                     <button id="update-button" class="update-button">UPDATE</button>
+                     <button id="discharge-button" class="action-button discharge-button">DISCHARGE</button>
+                     <button id="medical-records-button" class="action-button records-button">MEDICAL RECORDS</button>
+                     {% if user.role_id == 1 %} 
+                     <button id="delete-button" class="action-button delete-button">DELETE</button>
+                     {% endif %}
+                  </div>
+               </div>
+               <div id="status-message" class="status-message"></div>
+            </div>
+         </div>
+      </div>
+    <script>
+        // Load all patients when the page loads
+        document.addEventListener('DOMContentLoaded', function () {
+            loadPatients();
+        
+            // Add event listeners
+            document.querySelector('#search-button').addEventListener('click', searchPatients);
+            document.querySelector('#search-input').addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    searchPatients();
+                }
+            });
+        
+            document.querySelector('.back-button').addEventListener('click', showListView);
+            document.querySelector('#update-button').addEventListener('click', updatePatient);
+            
+            // Only add discharge button event listener if user has permission
+            {% if check_permission('discharge_patient') %}
+            document.querySelector('#discharge-button').addEventListener('click', dischargePatient);
+            {% else %}
+            // Hide the discharge button if user doesn't have permission
+            document.querySelector('#discharge-button').style.display = 'none';
+            {% endif %}
+            
+            document.querySelector('#medical-records-button').addEventListener('click', viewMedicalRecords);
+        
+            // Add delete button event listener if it exists (for admins only)
+            const deleteButton = document.getElementById('delete-button');
+            if (deleteButton) {
+                deleteButton.addEventListener('click', function() {
+                    const patientId = document.querySelector('#patient-id').value;
+                    const firstName = document.querySelector('#first-name').value;
+                    const lastName = document.querySelector('#last-name').value;
+                    const patientName = `${firstName} ${lastName}`;
+                    
+                    // Show confirmation dialog
+                    if (confirm(`Are you sure you want to delete patient ${patientName}? This action cannot be undone.`)) {
+                        // Send delete request
+                        deletePatient(patientId);
+                    }
+                });
+            }
+
+            // Define user permissions for JavaScript use
+            window.userPermissions = {
+                canDischargePatients: {{ check_permission('discharge_patient')|tojson }},
+                canViewRecords: {{ check_permission('view_medical_records')|tojson }}
+            };
+        });
+        
+        // Function to load all patients
+        function loadPatients() {
+            fetch('/search-patients')
+                .then(response => response.json())
+                .then(data => {
+                    displayPatients(data);
+                })
+                .catch(error => {
+                    console.error('Error loading patients:', error);
+                });
+        }
+        
+        // Function to search patients
+        function searchPatients() {
+            const searchTerm = document.querySelector('#search-input').value;
+        
+            fetch(`/search-patients?query=${encodeURIComponent(searchTerm)}`)
+                .then(response => response.json())
+                .then(data => {
+                    displayPatients(data);
+                })
+                .catch(error => {
+                    console.error('Error searching patients:', error);
+                });
+        }
+        
+        // Function to display patients in the grid
+        function displayPatients(patients) {
+            const patientsGrid = document.querySelector('#patients-grid');
+            patientsGrid.innerHTML = '';
+        
+            if (patients.length === 0) {
+                patientsGrid.innerHTML = '<div class="no-patients">No patients found</div>';
+                return;
+            }
+        
+            patients.forEach(patient => {
+                const patientCard = document.createElement('div');
+                patientCard.className = 'patient-card';
+                patientCard.setAttribute('data-patient-id', patient.patient_id);
+        
+                patientCard.innerHTML = `
+                    <div class="patient-header">
+                        <span class="patient-title">${patient.patient_name}</span>
+                        <span class="patient-info">${patient.gender}, ${patient.dob}</span>
+                    </div>
+                    <div class="patient-content">
+                        <p>Contact: ${patient.contact || 'Not provided'}</p>
+                        <p>Emergency: ${patient.emergency_contact || 'Not provided'}</p>
+                    </div>
+                `;
+        
+                patientCard.addEventListener('click', function () {
+                    const patientId = this.getAttribute('data-patient-id');
+                    showDetailView(patientId);
+                });
+        
+                patientsGrid.appendChild(patientCard);
+            });
+        }
+        
+        // Function to show detail view for a specific patient
+        function showDetailView(patientId) {
+            fetch(`/get-patient/${patientId}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Populate the form fields
+                    document.querySelector('#patient-id').value = data.patient_id;
+                    document.querySelector('#first-name').value = data.first_name;
+                    document.querySelector('#last-name').value = data.last_name;
+                    document.querySelector('#gender').value = data.gender;
+                    document.querySelector('#dob').value = data.dob;
+                    document.querySelector('#contact').value = data.contact || '';
+                    document.querySelector('#emergency-contact').value = data.emergency_contact || '';
+                    document.querySelector('#address').value = data.address || '';
+        
+                    // Show the detail view
+                    document.querySelector('.list-view').classList.add('hidden');
+                    document.querySelector('.detail-view').classList.add('active');
+                    document.querySelector('.back-button').style.display = 'flex';
+        
+                    // Clear any previous status messages
+                    const statusMessage = document.querySelector('#status-message');
+                    statusMessage.textContent = '';
+                    statusMessage.className = 'status-message';
+                })
+                .catch(error => {
+                    console.error('Error loading patient details:', error);
+                });
+        }
+        
+        // Function to show the list view
+        function showListView() {
+            document.querySelector('.list-view').classList.remove('hidden');
+            document.querySelector('.detail-view').classList.remove('active');
+            document.querySelector('.back-button').style.display = 'none';
+        }
+        
+        // Function to update a patient
+        function updatePatient() {
+            const patientId = document.querySelector('#patient-id').value;
+        
+            const data = {
+                first_name: document.querySelector('#first-name').value,
+                last_name: document.querySelector('#last-name').value,
+                gender: document.querySelector('#gender').value,
+                dob: document.querySelector('#dob').value,
+                contact: document.querySelector('#contact').value,
+                emergency_contact: document.querySelector('#emergency-contact').value,
+                address: document.querySelector('#address').value
+            };
+        
+            fetch(`/update-patient/${patientId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    const statusMessage = document.querySelector('#status-message');
+        
+                    if (data.success) {
+                        statusMessage.textContent = data.message;
+                        statusMessage.className = 'status-message success';
+        
+                        // Refresh patients in the background
+                        loadPatients();
+                    } else {
+                        statusMessage.textContent = data.error;
+                        statusMessage.className = 'status-message error';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error updating patient:', error);
+                    const statusMessage = document.querySelector('#status-message');
+                    statusMessage.textContent = 'An error occurred while updating the patient.';
+                    statusMessage.className = 'status-message error';
+                });
+        }
+        
+        // Function to delete a patient (for admins only)
+        function deletePatient(patientId) {
+            fetch(`/delete-patient/${patientId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show success message
+                    alert(data.message);
+                    // Return to list view and refresh
+                    showListView();
+                    loadPatients();
+                } else {
+                    // Show error message
+                    alert(data.error || 'An error occurred while deleting the patient.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while deleting the patient.');
+            });
+        }
+        
+        function dischargePatient() {
+            // Check if user has permission
+            if (!window.userPermissions.canDischargePatients) {
+                const statusMessage = document.querySelector('#status-message');
+                statusMessage.textContent = 'You do not have permission to discharge patients.';
+                statusMessage.className = 'status-message error';
+                return;
+            }
+            
+            const patientId = document.querySelector('#patient-id').value;
+            const patientName = `${document.querySelector('#first-name').value} ${document.querySelector('#last-name').value}`;
+        
+            // Confirm before discharging
+            if (!confirm(`Are you sure you want to discharge ${patientName}?`)) {
+                return;
+            }
+        
+            fetch(`/discharge-patient/${patientId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    const statusMessage = document.querySelector('#status-message');
+        
+                    if (data.success) {
+                        statusMessage.textContent = data.message;
+                        statusMessage.className = 'status-message success';
+        
+                        // Refresh patients in the background and return to list view after a delay
+                        loadPatients();
+                        setTimeout(showListView, 2000);
+                    } else {
+                        statusMessage.textContent = data.error || 'Error discharging patient.';
+                        statusMessage.className = 'status-message error';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error discharging patient:', error);
+                    const statusMessage = document.querySelector('#status-message');
+                    statusMessage.textContent = 'An error occurred while discharging the patient.';
+                    statusMessage.className = 'status-message error';
+                });
+        }
+        
+        function viewMedicalRecords() {
+            const patientId = document.querySelector('#patient-id').value;
+            window.location.href = `/medical-records?patient=${patientId}`;
+        }
+    </script>
+   </body>
+</html>

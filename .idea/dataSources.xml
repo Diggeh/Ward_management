@@ -8,5 +8,12 @@
       <jdbc-url>jdbc:sqlite:E:\Xampp\htdocs\Ward_management\WardManagementDB.db</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
+    <data-source source="LOCAL" name="WardManagementDB [2]" uuid="828a5185-8150-4b36-b68f-a470e2efdc15">
+      <driver-ref>sqlite.xerial</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
+      <jdbc-url>jdbc:sqlite:C:\Users\Home\Documents\GitHub\Ward_management\WardManagementDB.db</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>

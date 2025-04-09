@@ -1,147 +1,490 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-  <title>Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ward Management Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            background: #f5f5f5;
+        }
+
+        .sidebar {
+            width: 260px;
+            background: #003344;
+            color: white;
+            padding: 24px;
+            position: fixed;
+            min-height: 100vh;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-collapsed {
+            transform: translateX(-220px);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+
+        .user-info img {
+            width: 32px;
+            height: 32px;
+        }
+
+        .nav-links {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px;
+            text-decoration: none;
+            color: white;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .nav-link:hover {
+            background: #004455;
+        }
+
+        .nav-link img {
+            width: 20px;
+            height: 20px;
+        }
+
+        .logout {
+            position: absolute;
+            bottom: 24px;
+            left: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px;
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .logout:hover {
+            background: #004455;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            transition: margin-left 0.3s ease;
+        }
+
+        .main-content-expanded {
+            margin-left: 40px;
+        }
+
+        .header {
+            background: #003344;
+            color: white;
+            padding: 24px;
+            position: sticky;
+            top: 0;
+            z-index: 999;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .burger-menu {
+            font-size: 24px;
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            display: none;
+        }
+
+        .dashboard-content {
+            padding: 24px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            padding: 24px;
+            border-radius: 8px;
+            color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .stat-card h2 {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .stat-card p {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .stat-card img {
+            width: 48px;
+            height: 48px;
+        }
+
+        .patients {
+            background: #3399cc;
+        }
+
+        .admission {
+            background: #00cc99;
+        }
+
+        .discharge {
+            background: #00ff99;
+        }
+
+        .wards {
+            background: #6666ff;
+        }
+
+        .records {
+            background: #9966ff;
+        }
+
+        .maintenance {
+            background: #ff6666;
+        }
+
+        .bottom-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        .info-card {
+            background: white;
+            padding: 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .info-card h2 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #003344;
+        }
+
+        .info-content {
+            background: #f9f9f9;
+            border-radius: 4px;
+            padding: 16px;
+            min-height: 200px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .info-content ul {
+            list-style-type: none;
+        }
+
+        .info-content li {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #003344;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        @media (max-width: 1200px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .bottom-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-220px);
+                z-index: 1001;
+            }
+
+            .sidebar-active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .burger-menu {
+                display: block;
+            }
+
+            .stats-grid,
+            .bottom-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
+
 <body>
+    <div class="sidebar" id="sidebar">
+        <div class="user-info">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2'/%3E%3Ccircle cx='12' cy='7' r='4'/%3E%3C/svg%3E"
+                alt="User">
+            <span>{{ user.username }}</span>
+        </div>
 
-<header>
-  <div class="page-title">Ward Management Dashboard</div>
-<a href="/logout" class="button" style="float: right; color: white;">Logout</a>
-</header>
+        <nav class="nav-links">
+            <a href="{{ url_for('main.dashboard') }}"
+                class="nav-link {% if request.endpoint == 'main.dashboard' %}active{% endif %}">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='3' width='7' height='7'/%3E%3Crect x='14' y='3' width='7' height='7'/%3E%3Crect x='14' y='14' width='7' height='7'/%3E%3Crect x='3' y='14' width='7' height='7'/%3E%3C/svg%3E"
+                    alt="Dashboard">
+                <span>Dashboard</span>
+            </a>
+            <a href="{{ url_for('main.wards') }}"
+                class="nav-link {% if request.endpoint == 'main.wards' %}active{% endif %}">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'/%3E%3Cpolyline points='9 22 9 12 15 12 15 22'/%3E%3C/svg%3E"
+                    alt="Wards">
+                <span>Wards</span>
+            </a>
+            <a href="{{ url_for('main.patients') }}"
+                class="nav-link {% if request.endpoint == 'main.patients' %}active{% endif %}">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2'/%3E%3Ccircle cx='9' cy='7' r='4'/%3E%3Cpath d='M23 21v-2a4 4 0 0 0-3-3.87'/%3E%3Cpath d='M16 3.13a4 4 0 0 1 0 7.75'/%3E%3C/svg%3E"
+                    alt="Patients">
+                <span>Patients</span>
+            </a>
+            <a href="{{ url_for('main.admission') }}"
+                class="nav-link {% if request.endpoint == 'main.admission' %}active{% endif %}">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2'/%3E%3Ccircle cx='8.5' cy='7' r='4'/%3E%3Cline x1='20' y1='8' x2='20' y2='14'/%3E%3Cline x1='23' y1='11' x2='17' y2='11'/%3E%3C/svg%3E"
+                    alt="Admission">
+                <span>Admission</span>
+            </a>
+            <a href="{{ url_for('main.medical_records') }}"
+                class="nav-link {% if request.endpoint == 'main.medical_records' %}active{% endif %}">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z'/%3E%3Cpolyline points='14 2 14 8 20 8'/%3E%3Cline x1='16' y1='13' x2='8' y2='13'/%3E%3Cline x1='16' y1='17' x2='8' y2='17'/%3E%3Cpolyline points='10 9 9 9 8 9'/%3E%3C/svg%3E"
+                    alt="Medical Records">
+                <span>Medical Records</span>
+            </a>
 
-<div class="main-container">
-<div class="form-container">
-<h2>Patients:</h2>
-<ul>
-  {% for patient in patients %}
-  <li>{{ patient[1] }} - {{ patient[2] }} - Bed {{ patient[3] }} - {{ patient[4] }}
-    <a href="/discharge/{{ patient[0] }}">Discharge</a>
-  </li>
-  {% endfor %}
-</ul>
-</div>
+            {# Show Admin link only if user is an admin (role_id = 1) #}
+            {% if user.role_id == 1 %}
+            <a href="{{ url_for('main.admin_page') }}"
+                class="nav-link {% if request.endpoint == 'main.admin_page' %}active{% endif %}">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3Cpath d='M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z'/%3E%3C/svg%3E"
+                    alt="Admin">
+                <span>Admin</span>
+            </a>
+            {% endif %}
+        </nav>
 
-<div class="form-container">
-<h2>Admit Patient:</h2>
-<form method="POST" action="/admit">
-  <input type="text" name="name" placeholder="Name" required><br>
-  <input type="text" name="ward" placeholder="Ward" required><br>
-  <input type="number" name="bed" placeholder="Bed Number" required><br>
-  <button type="submit">Admit</button>
-</form>
-</div>
-</div>
+        <form action="{{ url_for('auth.logout') }}" method="POST" style="display: inline;">
+            <button type="submit" class="logout">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4'/%3E%3Cpolyline points='16 17 21 12 16 7'/%3E%3Cline x1='21' y1='12' x2='9' y2='12'/%3E%3C/svg%3E"
+                    alt="Logout">
+                <span>Log Out</span>
+            </button>
+        </form>
+    </div>
 
-<div class="background-image"></div>
+    <div class="main-content" id="main-content">
+        <header class="header">
+            <button class="burger-menu" id="menu-toggle">☰</button>
+            <h1>WARD MANAGEMENT DASHBOARD</h1>
+            <div style="width: 40px;"></div> <!-- Spacer for balance -->
+        </header>
 
+        <div class="dashboard-content">
+            <div class="stats-grid">
+                <div class="stat-card patients" onclick="location.href='{{ url_for('main.patients') }}'">
+                    <div class="stat-card-content">
+                        <div>
+                            <h2>PATIENTS</h2>
+                            <p>{{ current_date }}</p>
+                        </div>
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2'/%3E%3Ccircle cx='9' cy='7' r='4'/%3E%3Cpath d='M23 21v-2a4 4 0 0 0-3-3.87'/%3E%3Cpath d='M16 3.13a4 4 0 0 1 0 7.75'/%3E%3C/svg%3E"
+                            alt="Patients">
+                    </div>
+                </div>
+
+                <div class="stat-card admission" onclick="location.href='{{ url_for('main.admission') }}'">
+                    <div class="stat-card-content">
+                        <div>
+                            <h2>ADMISSION</h2>
+                            <p>{{ current_date }}</p>
+                        </div>
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2'/%3E%3Ccircle cx='8.5' cy='7' r='4'/%3E%3Cline x1='20' y1='8' x2='20' y2='14'/%3E%3Cline x1='23' y1='11' x2='17' y2='11'/%3E%3C/svg%3E"
+                            alt="Admission">
+                    </div>
+                </div>
+
+                <div class="stat-card wards" onclick="location.href='{{ url_for('main.wards') }}'">
+                    <div class="stat-card-content">
+                        <div>
+                            <h2>WARDS</h2>
+                            <p>{{ current_date }}</p>
+                        </div>
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 4v16'/%3E%3Cpath d='M2 8h18a2 2 0 0 1 2 2v10'/%3E%3Cpath d='M2 17h20'/%3E%3Cpath d='M6 8v9'/%3E%3C/svg%3E"
+                            alt="Beds">
+                    </div>
+                </div>
+
+                <div class="stat-card records" onclick="location.href='{{ url_for('main.medical_records') }}'">
+                    <div class="stat-card-content">
+                        <div>
+                            <h2>MEDICAL RECORDS</h2>
+                            <p>{{ current_date }}</p>
+                        </div>
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2'/%3E%3Crect x='8' y='2' width='8' height='4' rx='1' ry='1'/%3E%3Cpath d='M9 14h6'/%3E%3Cpath d='M9 10h6'/%3E%3Cpath d='M9 18h6'/%3E%3C/svg%3E"
+                            alt="Medical Records">
+                    </div>
+                </div>
+            </div>
+
+            <div class="bottom-grid">
+                <div class="info-card">
+                    <h2>Recent Admissions</h2>
+                    <div class="info-content">
+                        <ul>
+                            {% for admission in recent_admissions %}
+                            <li>
+                                {{ admission.patient.FirstName }} {{ admission.patient.LastName }} admitted on {{
+                                admission.AdmissionDate.strftime('%Y-%m-%d') }} with diagnosis: {{ admission.Diagnosis
+                                }}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <h2>Recent Discharges</h2>
+                    <div class="info-content">
+                        <ul>
+                            {% for discharge in recent_discharges %}
+                            <li>
+                                {{ discharge.patient.FirstName }} {{ discharge.patient.LastName }} discharged on {{
+                                discharge.DischargeDate.strftime('%Y-%m-%d') }} with diagnosis: {{ discharge.Diagnosis
+                                }}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <h2>Ward Capacities</h2>
+                    <div class="info-content">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Ward Name</th>
+                                    <th>Capacity</th>
+                                    <th>Type</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for ward in wards %}
+                                <tr>
+                                    <td>{{ ward.WardName }}</td>
+                                    <td>{{ ward.capacity_display }}</td>
+                                    <td>{{ ward.WardType }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <script>
+                    // Toggle sidebar
+                    document.getElementById("menu-toggle").addEventListener("click", function () {
+                        document.getElementById("sidebar").classList.toggle("sidebar-active");
+                        document.getElementById("main-content").classList.toggle("main-content-expanded");
+                    });
+
+                    // Initialize sidebar state based on screen size
+                    function checkScreenSize() {
+                        if (window.innerWidth <= 768) {
+                            document.getElementById("sidebar").classList.remove("sidebar-active");
+                            document.getElementById("main-content").classList.add("main-content-expanded");
+                        } else {
+                            document.getElementById("sidebar").classList.add("sidebar-active");
+                            document.getElementById("main-content").classList.remove("main-content-expanded");
+                        }
+                    }
+
+                    // Check on load and resize
+                    window.addEventListener('load', checkScreenSize);
+                    window.addEventListener('resize', checkScreenSize);
+                </script>
 </body>
 
-<style>
-
-.background-image {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: url('https://images.pexels.com/photos/236380/pexels-photo-236380.jpeg?auto=compress&cs=tinysrgb') no-repeat center center;
-    background-size: cover;
-    z-index: -1;
-    animation: fadeInImage 1s ease-in-out;
-    opacity: 0.39;
-  }
-
-  body {
-    font-family: Arial, Helvetica, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f4f4f9;
-  }
-
-  header {
-    background-color: forestgreen;
-    color: white;
-    padding: 15px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 24px;
-    font-weight: bold;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
-
-  h2 {
-    margin-top: 0;
-  }
-
-  .form-container {
-    background: white;
-    margin: 30px auto;
-    padding: 20px;
-    border-radius: 10px;
-    max-width: 600px;
-    width: 100%;
-  }
-
-  .main-container {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    align-items: center;
-    margin-top: 100px;
-    /* animation: fadeInContainer 1s ease-in-out; */
-  }
-
-  @keyframes fadeInImage {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 0.39;
-    }
-  }
-
-  /* @keyframes fadeInContainer {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  } */
-
-  input[type=text], input[type=number] {
-    width: calc(100% - 20px);
-    padding: 10px;
-    margin: 10px 0;
-    display: block;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    box-sizing: border-box;
-  }
-
-  button {
-      background-color: #30AD23;
-      color: white;
-      padding: 10px;
-      margin: 10px 0;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      width: 100%;
-      opacity: 0.9;
-    }
-  
-  button:hover {
-    opacity: 1;
-  }
-
-  a {
-    color: #D0F0C0;
-    text-decoration: none;
-    font-weight: bold;
-  }
-  
-</style>
 </html>

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Bed Assignments</title>
+</head>
+<style>
+    body {
+        font-family: Arial, Helvetica, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f9;
+    }
+
+    header {
+        background-color: forestgreen;
+        color: white;
+        padding: 20px 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 20px;
+        font-weight: bold;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        position: fixed;
+        top: 0;
+        width: 100%;
+        z-index: 1001;
+        box-sizing: border-box;
+    }
+
+    h2 {
+        margin-top: 0;
+    }
+
+    .header-buttons {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        right: 20px;
+        position: absolute;
+    }
+    .main-container {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        align-items: center;
+        margin-top: 100px;
+        animation: fadeInContainer 1s ease-in-out;
+    }
+
+    @keyframes fadeInContainer {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    #sidebar {
+        width: 250px;
+        height: 100vh;
+        background-color: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 20px;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3);
+        position: fixed;
+        left: -289px;
+        top: 63px;
+        transition: left 0.3s ease;
+        z-index: 1000;
+    }
+
+    #hoverSidebar:hover {
+        left: 0;
+    }
+
+    #sidebar ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    #sidebar ul li {
+        margin: 20px 0;
+
+    }
+
+    #sidebar ul li a, #sidebar ul li button {
+        color: white;
+        text-decoration: none;
+        font-size: 20px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        display: block;
+        width: 100%;
+        padding: 10px;
+        text-align: left;
+    }
+
+    #sidebar ul li a:hover, #sidebar ul li button:hover {
+        text-decoration: underline;
+    }
+
+    .burger-menu {
+        font-size: 24px;
+        background-color: transparent;
+        color: white;
+        border: none;
+        cursor: pointer;
+        padding: 10px;
+        justify-content: center;
+        right: 1868px;
+        position: fixed;
+    }
+
+    .sidebar-active {
+        left: 0 !important;
+    }
+</style>
+<body>
+<header>
+    <div class="page-title">Wards and Beds</div>
+    <div class="header-buttons">
+        <button id="menu-toggle" class="burger-menu">☰</button>
+        <a href="/logout" class="button" style="float: right; color: white;">Logout</a>
+    </div>
+</header>
+
+<div id="sidebar">
+    <!--  <h2>Ward Management System</h2>-->
+    <ul>
+        <li><button onclick="location.href='dashboard.html'">Dashboard</button></li>
+        <li><a href="#">Link 2</a></li>
+        <li><a href="#">Link 3</a></li>
+    </ul>
+</div>
+
+<div class="main-container">
+    <div class="form-container">
+</div>
+</div>
+
+</body>
+<script>
+    document.getElementById("menu-toggle").addEventListener("click", function() {
+        document.getElementById("sidebar").classList.toggle("sidebar-active");
+    });
+</script>
+</html>
