@@ -1,6 +1,6 @@
 from database import db
 from flask_login import UserMixin
-
+from sqlalchemy import CheckConstraint
 
 class Admission(db.Model):
     __tablename__ = "Admissions"
@@ -11,18 +11,18 @@ class Admission(db.Model):
     BedID = db.Column(db.Integer, db.ForeignKey("Beds.BedID"), nullable=False)
     DoctorID = db.Column(
         db.Integer, db.ForeignKey("users.id")
-    )  # Changed from doctor_id to DoctorID
+    )  
     AdmissionDate = db.Column(db.Date, nullable=False)
     DischargeDate = db.Column(db.Date)
     Diagnosis = db.Column(db.Text)
-    # DoctorInCharge field is removed
+    
 
-    # Relationships
+    
     patient = db.relationship("Patient", backref="admissions")
     bed = db.relationship("Bed", backref="admissions")
     doctor = db.relationship(
         "User", backref="doctor_admissions", foreign_keys=[DoctorID]
-    )  # Update foreign key reference
+    )  
 
 
 class Bed(db.Model):
@@ -32,9 +32,9 @@ class Bed(db.Model):
     BedNumber = db.Column(db.Integer, nullable=False)
     BedStatus = db.Column(db.Text)
 
-    # Relationships
+    
     ward = db.relationship("Ward", backref="beds")
-    # Removed redundant admissions relationship (defined in Admission class)
+    
 
 
 class MedicalRecord(db.Model):
@@ -49,7 +49,7 @@ class MedicalRecord(db.Model):
     Medications = db.Column(db.Text)
     Notes = db.Column(db.Text)
 
-    # Relationship
+    
     patient = db.relationship("Patient", backref="medical_records")
 
 
@@ -59,12 +59,12 @@ class Patient(db.Model):
     FirstName = db.Column(db.Text, nullable=False)
     LastName = db.Column(db.Text, nullable=False)
     DateOfBirth = db.Column(db.Date, nullable=False)
-    Gender = db.Column(db.Text)
-    ContactNumber = db.Column(db.Integer)
-    EmergencyContact = db.Column(db.Integer)
+    Gender = db.Column(db.Text, CheckConstraint("Gender IN ('Male', 'Female', 'Other')"))
+    ContactNumber = db.Column(db.Integer, CheckConstraint('ContactNumber >= 100000000 AND ContactNumber < 10000000000'))
+    EmergencyContact = db.Column(db.Integer, CheckConstraint('EmergencyContact >= 100000000 AND EmergencyContact < 10000000000'))
     Address = db.Column(db.Text)
 
-    # Relationships defined via backref in other models
+    
 
 
 class Ward(db.Model):
@@ -74,7 +74,7 @@ class Ward(db.Model):
     WardCapacity = db.Column(db.Integer)
     WardType = db.Column(db.Text)
 
-    # Relationships defined via backref in other models
+    
 
 
 class Role(db.Model):
@@ -83,7 +83,7 @@ class Role(db.Model):
     role_name = db.Column(db.Text, nullable=False, unique=True)
     users = db.relationship("User", backref="role")
 
-    # Use backref from RolePermission
+    
 
 
 class Permission(db.Model):
@@ -91,7 +91,7 @@ class Permission(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     permission_name = db.Column(db.Text, nullable=False, unique=True)
 
-    # Use backref from RolePermission
+    
 
 
 class RolePermission(db.Model):
@@ -100,7 +100,7 @@ class RolePermission(db.Model):
     role_id = db.Column(db.Integer, db.ForeignKey("roles.id"))
     permission_id = db.Column(db.Integer, db.ForeignKey("permissions.id"))
 
-    # Relationships
+    
     role = db.relationship("Role", backref="permissions_assoc")
     permission = db.relationship("Permission", backref="roles_assoc")
 
@@ -112,7 +112,7 @@ class User(db.Model, UserMixin):
     password = db.Column(db.Text, nullable=False)
     role_id = db.Column(db.Integer, db.ForeignKey("roles.id"))
 
-    # Role relationship defined via backref in Role class
+    
 
     def get_id(self):
         return str(self.id)
